@@ -156,6 +156,12 @@
         };
     };
 
+    // Eat Food
+    let eatFood = true;
+    if (localStorage.getItem('eatFood')) {
+        eatFood = localStorage.getItem('eatFood') === "true" ? true : false;
+    }
+
     /*****************
     *  Translations  *
     *****************/
@@ -183,7 +189,8 @@
         settings: 'Settings',
         soon: 'Soon...',
         type: 'Type',
-        yes: 'Yes'
+        yes: 'Yes',
+        eatFood: 'Eat Food'
     }
 
     const contentPL = {
@@ -266,6 +273,8 @@
         document.getElementById("autoGoButton").innerHTML = 'STOP'
         document.getElementById("autoGoButton").removeEventListener("click", setAutoGoActive);
         document.getElementById("autoGoButton").addEventListener("click", setAutoGoInactive);
+        document.getElementById("autoGoButton").removeEventListener("touchstart", setAutoGoActive);
+        document.getElementById("autoGoButton").addEventListener("touchstart", setAutoGoInactive);
         autoGo();
     };
 
@@ -275,6 +284,8 @@
         document.getElementById("autoGoButton").innerHTML = 'Auto GO'
         document.getElementById("autoGoButton").addEventListener("click", setAutoGoActive);
         document.getElementById("autoGoButton").removeEventListener("click", setAutoGoInactive);
+        document.getElementById("autoGoButton").addEventListener("touchstart", setAutoGoActive);
+        document.getElementById("autoGoButton").removeEventListener("touchstart", setAutoGoInactive);
 
         clearTimeout(setTimeout);
 
@@ -418,6 +429,17 @@
                             <div id="set_event_monster_id_3" class="settingsButton">Boss</div>
                         </div>
                     </div>
+
+                    <div
+                        id="food_settings"
+                        class="settings_box"
+                    >
+                        <div class="settingsHeaderBig">${content.eatFood}</div>
+                        <div class="settingsSubcontent">
+                            <div id="eat_food_true" class="settingsButton">${content.yes}</div>
+                            <div id="eat_food_false" class="settingsButton">${content.no}</div>
+                        </div>
+                    </div>
                 </div>`;
         document.getElementById("header_game").insertBefore(settingsWindow, document.getElementById("header_game").children[0]);
 
@@ -426,6 +448,7 @@
         overlayBack.setAttribute("id", "overlayBack");
         overlayBack.setAttribute("style", `height: ${wrapperHeight}px;`);
         overlayBack.addEventListener("click", closeSettings);
+        overlayBack.addEventListener("touchstart", closeSettings);
         document.getElementsByTagName("body")[0].appendChild(overlayBack);
 
         // Set Language
@@ -574,6 +597,15 @@
         $("#set_event_monster_id_2").click(function () { setEventMonster('2') });
         $("#set_event_monster_id_3").click(function () { setEventMonster('3') });
 
+        function setEatFood(bool) {
+            eatFood = bool;
+            localStorage.setItem('eatFood', bool);
+            reloadSettings();
+        };
+
+        $("#eat_food_true").click(function () { setEatFood(true) });
+        $("#eat_food_false").click(function () { setEatFood(false) });
+
         function reloadSettings() {
             closeSettings();
             openSettings();
@@ -608,6 +640,10 @@
             $('#event_expedition_settings').addClass(doEventExpedition ? 'active' : 'inactive');
             $(`#do_event_expedition_${doEventExpedition}`).addClass('active');
             $(`#set_event_monster_id_${eventMonsterId}`).addClass('active');
+
+            $('#food_settings').addClass(eatFood ? 'active' : 'inactive');
+            $(`#eat_food_${eatFood}`).addClass('active');
+
         };
 
         setActiveButtons();
@@ -622,9 +658,11 @@
     if (autoGoActive == false) {
         autoGoButton.innerHTML = 'Auto GO';
         autoGoButton.addEventListener("click", setAutoGoActive);
+        autoGoButton.addEventListener("touchstart", setAutoGoActive);
     } else {
         autoGoButton.innerHTML = 'STOP';
         autoGoButton.addEventListener("click", setAutoGoInactive);
+        autoGoButton.addEventListener("touchstart", setAutoGoInactive);
     };
 
     document.getElementById("mainmenu").insertBefore(autoGoButton, document.getElementById("mainmenu").children[0]);
@@ -636,6 +674,7 @@
     settingsButton.innerHTML = `<img src="${assetsUrl}/cog.svg" title="Ustawienia" height="20" width="20" style="filter: invert(83%) sepia(52%) saturate(503%) hue-rotate(85deg) brightness(103%) contrast(101%); z-index: 999;">`;
     settingsButton.setAttribute("style", "display: flex; justify-content: center; align-items: center; height: 27px; width: 27px; cursor: pointer; border: none; color: #5dce5d; padding: 0; background-image: url('https://i.imgur.com/jf7BXTX.png')");
     settingsButton.addEventListener("click", openSettings);
+    settingsButton.addEventListener("touchstart", openSettings);
     document.getElementById("mainmenu").insertBefore(settingsButton, document.getElementById("mainmenu").children[1]);
 
     /****************
@@ -690,6 +729,7 @@
     function setDoExpedition(bool) {
         doExpedition = bool;
         localStorage.setItem('doExpedition', bool);
+        setPauseExpedition(false);
     };
 
     function setPauseExpedition(bool) {
@@ -707,6 +747,11 @@
         localStorage.setItem('doEventExpedition', bool);
     };
 
+    function setEatFood(bool) {
+        eatFood = bool;
+        localStorage.setItem('eatFood', bool);
+    };
+
     /****************
     *    Auto Go    *
     ****************/
@@ -719,7 +764,6 @@
         const clickDelay = getRandomInt(900, 2400);
 
         // Claim Daily Reward
-
         if (document.getElementById("blackoutDialogLoginBonus") !== null) {
             setTimeout(function () {
                 document.getElementById("blackoutDialogLoginBonus").getElementsByTagName("input")[0].click();
@@ -727,7 +771,6 @@
         };
 
         // Close Notifications
-
         if (document.getElementById("blackoutDialognotification") !== null && document.getElementById("blackoutDialognotification").isDisplayed()) {
             setTimeout(function () {
                 document.getElementById("blackoutDialognotification").getElementsByTagName("input")[0].click();
@@ -775,8 +818,56 @@
             };
             showLowHealthAlert();
 
-            // @TODO
-        } else if (player.hp > 80) {
+            // Use food
+            /*
+            # Eat Food Logic
+                - Check if the health is below 40%
+                - If yes, navigate to the overview page
+                - Check if there is food in the inventory
+                - If yes, double click on the food item
+            */
+
+            if (eatFood) {
+                const inOverviewPage = $("body").first().attr("id") === "overviewPage";
+
+                if (!inOverviewPage) {
+                    setTimeout(function () {
+                        $("#mainmenu a.menuitem")[0].click();
+                    }, clickDelay);
+                } else {
+                    // Any starting with item-i-7- is food like item-i-7-1, item-i-7-2, item-i-7-3
+                    // "item-i-7-1 ui-draggable …ble-handle item-i-green"
+                    // it must be ui-draggable because it has the double click event listener
+
+                    const foodItemsNodeList = document.querySelectorAll("[class^='item-i-7-']");
+                    const foodItemsArray = Array.from(foodItemsNodeList);
+                    const draggableFoodItems = foodItemsArray.filter(item => item.classList.contains('ui-draggable'));
+                    console.log("Food Items: " + draggableFoodItems.length);
+
+                    if (draggableFoodItems.length === 0) {
+                        console.log("No food items found, stopping eating food.");
+                        setEatFood(false);
+                    } else {
+                        console.log("HP: " + player.hp);
+                        const randomFoodItem = draggableFoodItems[getRandomInt(0, draggableFoodItems.length - 1)];
+
+                        setTimeout(function () {
+                            randomFoodItem.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+                        }, clickDelay);
+
+                        setTimeout(function () {
+                            console.log("HP: " + player.hp);
+                        }, clickDelay * 2);
+
+                        // setTimeout(function () {
+                        //     $("#mainmenu a.menuitem")[1].click();
+                        // }, clickDelay * 3);
+                    };
+                };
+            }
+        }
+
+        if (player.hp > 80) {
             // Remove low health alert
             if (document.getElementById("lowHealth")) {
                 document.getElementById("lowHealth").remove();
@@ -800,12 +891,16 @@
                 const inPanteonPage = $("body").first().attr("id") === "questsPage";
 
                 if (!inPanteonPage) {
-                    $("#mainmenu a.menuitem")[1].click();
+                    setTimeout(function () {
+                        $("#mainmenu a.menuitem")[1].click();
+                    }, clickDelay);
                 } else {
                     const completedQuests = $("#content .contentboard_slot a.quest_slot_button_finish");
 
                     if (completedQuests.length) {
-                        completedQuests[0].click();
+                        setTimeout(function () {
+                            completedQuests[0].click();
+                        }, clickDelay);
                     } else {
                         repeatQuests();
                     }
@@ -816,12 +911,14 @@
                 const failedQuests = $("#content .contentboard_slot a.quest_slot_button_restart");
 
                 if (failedQuests.length) {
-                    failedQuests[0].click();
+                    setTimeout(function () {
+                        failedQuests[0].click();
+                    }, clickDelay);
                 } else {
                     takeQuest();
                     checkDungeonQuests();
                 }
-            }
+            };
 
             function getIconName(url) {
                 if (url.includes('8aada67d4c5601e009b9d2a88f478c')) {
