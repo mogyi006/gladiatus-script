@@ -216,7 +216,8 @@
         settings: 'Ustawienia',
         soon: 'Wkrótce...',
         type: 'Rodzaj',
-        yes: 'Tak'
+        yes: 'Tak',
+        eatFood: 'Eat Food'
     }
 
     const contentES = {
@@ -242,7 +243,8 @@
         settings: 'Configuración',
         soon: 'Próximamente...',
         type: 'Tipo',
-        yes: 'Si'
+        yes: 'Si',
+        eatFood: 'Eat Food'
     }
 
     let content;
@@ -473,9 +475,13 @@
             reloadSettings();
         };
 
-        $("#languageEN").click(function () { setLanguage('EN') });
-        $("#languagePL").click(function () { setLanguage('PL') });
-        $("#languageES").click(function () { setLanguage('ES') });
+        // $("#languageEN").click(function () { setLanguage('EN') });
+        // $("#languagePL").click(function () { setLanguage('PL') });
+        // $("#languageES").click(function () { setLanguage('ES') });
+        $("#languageEN").on('touchstart click', function () { setLanguage('EN') });
+        $("#languagePL").on('touchstart click', function () { setLanguage('PL') });
+        $("#languageES").on('touchstart click', function () { setLanguage('ES') });
+
 
         // Change Settings
 
@@ -485,8 +491,10 @@
             reloadSettings();
         };
 
-        $("#do_expedition_true").click(function () { setDoExpedition(true) });
-        $("#do_expedition_false").click(function () { setDoExpedition(false) });
+        // $("#do_expedition_true").click(function () { setDoExpedition(true) });
+        // $("#do_expedition_false").click(function () { setDoExpedition(false) });
+        $("#do_expedition_true").on('touchstart click', function () { setDoExpedition(true) });
+        $("#do_expedition_false").on('touchstart click', function () { setDoExpedition(false) });
 
         function setMonster(id) {
             monsterId = id;
@@ -494,10 +502,14 @@
             reloadSettings();
         };
 
-        $("#set_monster_id_0").click(function () { setMonster('0') });
-        $("#set_monster_id_1").click(function () { setMonster('1') });
-        $("#set_monster_id_2").click(function () { setMonster('2') });
-        $("#set_monster_id_3").click(function () { setMonster('3') });
+        // $("#set_monster_id_0").click(function () { setMonster('0') });
+        // $("#set_monster_id_1").click(function () { setMonster('1') });
+        // $("#set_monster_id_2").click(function () { setMonster('2') });
+        // $("#set_monster_id_3").click(function () { setMonster('3') });
+        $("#set_monster_id_0").on('touchstart click', function () { setMonster('0') });
+        $("#set_monster_id_1").on('touchstart click', function () { setMonster('1') });
+        $("#set_monster_id_2").on('touchstart click', function () { setMonster('2') });
+        $("#set_monster_id_3").on('touchstart click', function () { setMonster('3') });
 
         function setDoDungeon(bool) {
             doDungeon = bool;
@@ -505,8 +517,10 @@
             reloadSettings();
         };
 
-        $("#do_dungeon_true").click(function () { setDoDungeon(true) });
-        $("#do_dungeon_false").click(function () { setDoDungeon(false) });
+        // $("#do_dungeon_true").click(function () { setDoDungeon(true) });
+        // $("#do_dungeon_false").click(function () { setDoDungeon(false) });
+        $("#do_dungeon_true").on('touchstart click', function () { setDoDungeon(true) });
+        $("#do_dungeon_false").on('touchstart click', function () { setDoDungeon(false) });
 
         function setDungeonDifficulty(difficulty) {
             dungeonDifficulty = difficulty;
@@ -514,8 +528,10 @@
             reloadSettings();
         };
 
-        $("#set_dungeon_difficulty_normal").click(function () { setDungeonDifficulty("normal") });
-        $("#set_dungeon_difficulty_advanced").click(function () { setDungeonDifficulty("advanced") });
+        // $("#set_dungeon_difficulty_normal").click(function () { setDungeonDifficulty("normal") });
+        // $("#set_dungeon_difficulty_advanced").click(function () { setDungeonDifficulty("advanced") });
+        $("#set_dungeon_difficulty_normal").on('touchstart click', function () { setDungeonDifficulty("normal") });
+        $("#set_dungeon_difficulty_advanced").on('touchstart click', function () { setDungeonDifficulty("advanced") });
 
         function setDoArena(bool) {
             doArena = bool;
@@ -523,8 +539,10 @@
             reloadSettings();
         };
 
-        $("#do_arena_true").click(function () { setDoArena(true) });
-        $("#do_arena_false").click(function () { setDoArena(false) });
+        // $("#do_arena_true").click(function () { setDoArena(true) });
+        // $("#do_arena_false").click(function () { setDoArena(false) });
+        $("#do_arena_true").on('touchstart click', function () { setDoArena(true) });
+        $("#do_arena_false").on('touchstart click', function () { setDoArena(false) });
 
         function setArenaOpponentLevel(level) {
             arenaOpponentLevel = level;
@@ -532,9 +550,12 @@
             reloadSettings();
         };
 
-        $("#set_arena_opponent_level_min").click(function () { setArenaOpponentLevel('min') });
-        $("#set_arena_opponent_level_max").click(function () { setArenaOpponentLevel('max') });
-        $("#set_arena_opponent_level_random").click(function () { setArenaOpponentLevel('random') });
+        // $("#set_arena_opponent_level_min").click(function () { setArenaOpponentLevel('min') });
+        // $("#set_arena_opponent_level_max").click(function () { setArenaOpponentLevel('max') });
+        // $("#set_arena_opponent_level_random").click(function () { setArenaOpponentLevel('random') });
+        $("#set_arena_opponent_level_min").on('touchstart click', function () { setArenaOpponentLevel('min') });
+        $("#set_arena_opponent_level_max").on('touchstart click', function () { setArenaOpponentLevel('max') });
+        $("#set_arena_opponent_level_random").on('touchstart click', function () { setArenaOpponentLevel('random') });
 
         function setDoCircus(bool) {
             doCircus = bool;
@@ -542,8 +563,10 @@
             reloadSettings();
         };
 
-        $("#do_circus_true").click(function () { setDoCircus(true) });
-        $("#do_circus_false").click(function () { setDoCircus(false) });
+        // $("#do_circus_true").click(function () { setDoCircus(true) });
+        // $("#do_circus_false").click(function () { setDoCircus(false) });
+        $("#do_circus_true").on('touchstart click', function () { setDoCircus(true) });
+        $("#do_circus_false").on('touchstart click', function () { setDoCircus(false) });
 
         function setCircusOpponentLevel(level) {
             circusOpponentLevel = level;
@@ -551,9 +574,12 @@
             reloadSettings();
         };
 
-        $("#set_circus_opponent_level_min").click(function () { setCircusOpponentLevel('min') });
-        $("#set_circus_opponent_level_max").click(function () { setCircusOpponentLevel('max') });
-        $("#set_circus_opponent_level_random").click(function () { setCircusOpponentLevel('random') });
+        // $("#set_circus_opponent_level_min").click(function () { setCircusOpponentLevel('min') });
+        // $("#set_circus_opponent_level_max").click(function () { setCircusOpponentLevel('max') });
+        // $("#set_circus_opponent_level_random").click(function () { setCircusOpponentLevel('random') });
+        $("#set_circus_opponent_level_min").on('touchstart click', function () { setCircusOpponentLevel('min') });
+        $("#set_circus_opponent_level_max").on('touchstart click', function () { setCircusOpponentLevel('max') });
+        $("#set_circus_opponent_level_random").on('touchstart click', function () { setCircusOpponentLevel('random') });
 
         function setDoQuests(bool) {
             doQuests = bool;
@@ -561,8 +587,10 @@
             reloadSettings();
         };
 
-        $("#do_quests_true").click(function () { setDoQuests(true) });
-        $("#do_quests_false").click(function () { setDoQuests(false) });
+        // $("#do_quests_true").click(function () { setDoQuests(true) });
+        // $("#do_quests_false").click(function () { setDoQuests(false) });
+        $("#do_quests_true").on('touchstart click', function () { setDoQuests(true) });
+        $("#do_quests_false").on('touchstart click', function () { setDoQuests(false) });
 
         function setQuestTypes(type) {
             questTypes[type] = !questTypes[type];
@@ -570,12 +598,18 @@
             reloadSettings();
         };
 
-        $("#do_combat_quests").click(function () { setQuestTypes('combat') });
-        $("#do_arena_quests").click(function () { setQuestTypes('arena') });
-        $("#do_circus_quests").click(function () { setQuestTypes('circus') });
-        $("#do_expedition_quests").click(function () { setQuestTypes('expedition') });
-        $("#do_dungeon_quests").click(function () { setQuestTypes('dungeon') });
-        $("#do_items_quests").click(function () { setQuestTypes('items') });
+        // $("#do_combat_quests").click(function () { setQuestTypes('combat') });
+        // $("#do_arena_quests").click(function () { setQuestTypes('arena') });
+        // $("#do_circus_quests").click(function () { setQuestTypes('circus') });
+        // $("#do_expedition_quests").click(function () { setQuestTypes('expedition') });
+        // $("#do_dungeon_quests").click(function () { setQuestTypes('dungeon') });
+        // $("#do_items_quests").click(function () { setQuestTypes('items') });
+        $("#do_combat_quests").on('touchstart click', function () { setQuestTypes('combat') });
+        $("#do_arena_quests").on('touchstart click', function () { setQuestTypes('arena') });
+        $("#do_circus_quests").on('touchstart click', function () { setQuestTypes('circus') });
+        $("#do_expedition_quests").on('touchstart click', function () { setQuestTypes('expedition') });
+        $("#do_dungeon_quests").on('touchstart click', function () { setQuestTypes('dungeon') });
+        $("#do_items_quests").on('touchstart click', function () { setQuestTypes('items') });
 
         function setDoEventExpedition(bool) {
             doEventExpedition = bool;
@@ -583,8 +617,10 @@
             reloadSettings();
         };
 
-        $("#do_event_expedition_true").click(function () { setDoEventExpedition(true) });
-        $("#do_event_expedition_false").click(function () { setDoEventExpedition(false) });
+        // $("#do_event_expedition_true").click(function () { setDoEventExpedition(true) });
+        // $("#do_event_expedition_false").click(function () { setDoEventExpedition(false) });
+        $("#do_event_expedition_true").on('touchstart click', function () { setDoEventExpedition(true) });
+        $("#do_event_expedition_false").on('touchstart click', function () { setDoEventExpedition(false) });
 
         function setEventMonster(id) {
             eventMonsterId = id;
@@ -592,10 +628,14 @@
             reloadSettings();
         };
 
-        $("#set_event_monster_id_0").click(function () { setEventMonster('0') });
-        $("#set_event_monster_id_1").click(function () { setEventMonster('1') });
-        $("#set_event_monster_id_2").click(function () { setEventMonster('2') });
-        $("#set_event_monster_id_3").click(function () { setEventMonster('3') });
+        // $("#set_event_monster_id_0").click(function () { setEventMonster('0') });
+        // $("#set_event_monster_id_1").click(function () { setEventMonster('1') });
+        // $("#set_event_monster_id_2").click(function () { setEventMonster('2') });
+        // $("#set_event_monster_id_3").click(function () { setEventMonster('3') });
+        $("#set_event_monster_id_0").on('touchstart click', function () { setEventMonster('0') });
+        $("#set_event_monster_id_1").on('touchstart click', function () { setEventMonster('1') });
+        $("#set_event_monster_id_2").on('touchstart click', function () { setEventMonster('2') });
+        $("#set_event_monster_id_3").on('touchstart click', function () { setEventMonster('3') });
 
         function setEatFood(bool) {
             eatFood = bool;
@@ -603,8 +643,10 @@
             reloadSettings();
         };
 
-        $("#eat_food_true").click(function () { setEatFood(true) });
-        $("#eat_food_false").click(function () { setEatFood(false) });
+        // $("#eat_food_true").click(function () { setEatFood(true) });
+        // $("#eat_food_false").click(function () { setEatFood(false) });
+        $("#eat_food_true").on('touchstart click', function () { setEatFood(true) });
+        $("#eat_food_false").on('touchstart click', function () { setEatFood(false) });
 
         function reloadSettings() {
             closeSettings();
