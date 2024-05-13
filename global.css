@@ -1,5 +1,4 @@
-#autoGoButton
-{
+#autoGoButton {
     height: 27px;
     width: 150px;
     margin-right: 2px;
@@ -11,8 +10,7 @@
 }
 
 
-#settingsWindow
-{
+#settingsWindow {
     height: 511px;
     width: 538px;
     padding: 50px 40px;
@@ -26,8 +24,7 @@
     font: 600 16px Arial;
 }
 
-#settingsLanguage
-{
+#settingsLanguage {
     position: absolute;
     top: 20px;
     right: 62px;
@@ -38,42 +35,36 @@
     cursor: default;
 }
 
-#settingsLanguage img
-{
+#settingsLanguage img {
     cursor: pointer;
     border: 1px solid #612d04;
 }
 
-#settingsHeader
-{
+#settingsHeader {
     display: block;
     padding-top: 20px;
     letter-spacing: 2px;
 }
 
-#settingsContent
-{
+#settingsContent {
     display: grid;
     margin-top: 20px;
     grid-template-columns: 50% 50%;
-    grid-template-rows: 180px 130px 130px;
+    grid-template-rows: 130px 130px 130px 130px;
     width: 100%;
 }
 
-.settingsHeaderBig
-{
+.settingsHeaderBig {
     margin: 3px 0px;
 }
 
-.settingsHeaderSmall
-{
+.settingsHeaderSmall {
     font-size: 14px;
     font-weight: 400;
     margin-top: 6px;
 }
 
-.settingsSubcontent
-{
+.settingsSubcontent {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -81,8 +72,7 @@
     padding: 0px 22px;
 }
 
-.settingsButton
-{
+.settingsButton {
     border: solid 1px #e9d2a0;
     height: 25px;
     width: 100%;
@@ -95,12 +85,11 @@
     box-shadow: 0 0 0 1px #8e753f;
     font-size: 13px;
     background: #390301;
-    background: -moz-linear-gradient(top,#c3ab6f,#886933);
-    background: linear-gradient(to bottom,#c3ab6f,#886933);
+    background: -moz-linear-gradient(top, #c3ab6f, #886933);
+    background: linear-gradient(to bottom, #c3ab6f, #886933);
 }
 
-.settingsButton:hover
-{
+.settingsButton:hover {
     background: linear-gradient(to bottom, #C3AB6F, #DACFA2);
     cursor: pointer;
 }
@@ -175,8 +164,7 @@
     background-image: url('https://raw.githubusercontent.com/ebodziony/gladiatus-script/master/assets/icon_items_active.jpg')
 }
 
-#overlayBack
-{
+#overlayBack {
     position: absolute;
     top: 0;
     left: 0;
