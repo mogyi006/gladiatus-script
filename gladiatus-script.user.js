@@ -179,6 +179,10 @@
     if (localStorage.getItem('saveGoldItemHash')) {
         saveGoldItemHash = localStorage.getItem('saveGoldItemHash');
     }
+    let saveGoldItemLevel = 0;
+    if (localStorage.getItem('saveGoldItemLevel')) {
+        saveGoldItemLevel = Number(localStorage.getItem('saveGoldItemLevel'));
+    }
     let saveGoldAmount = 100000;
     if (localStorage.getItem('saveGoldAmount')) {
         saveGoldAmount = Number(localStorage.getItem('saveGoldAmount'));
@@ -483,8 +487,9 @@
                     >
                         <div class="settingsHeaderBig">${content.saveGold}</div>
                         <div class="settingsSubcontent">
-                            <div id="save_gold_true" class="settingsButton">${content.yes}</div>
-                            <div id="save_gold_false" class="settingsButton">${content.no}</div>
+                            <div id="save_gold_0" class="settingsButton">${content.no}</div>
+                            <div id="save_gold_100" class="settingsButton">${content[100]}</div>
+                            <div id="save_gold_250" class="settingsButton">${content[250]}</div>
                         </div>
                     </div>
                 </div>`;
@@ -520,9 +525,6 @@
             reloadSettings();
         };
 
-        // $("#languageEN").click(function () { setLanguage('EN') });
-        // $("#languagePL").click(function () { setLanguage('PL') });
-        // $("#languageES").click(function () { setLanguage('ES') });
         $("#languageEN").on('touchstart click', function () { setLanguage('EN') });
         $("#languagePL").on('touchstart click', function () { setLanguage('PL') });
         $("#languageES").on('touchstart click', function () { setLanguage('ES') });
@@ -536,8 +538,6 @@
             reloadSettings();
         };
 
-        // $("#do_expedition_true").click(function () { setDoExpedition(true) });
-        // $("#do_expedition_false").click(function () { setDoExpedition(false) });
         $("#do_expedition_true").on('touchstart click', function () { setDoExpedition(true) });
         $("#do_expedition_false").on('touchstart click', function () { setDoExpedition(false) });
 
@@ -547,10 +547,6 @@
             reloadSettings();
         };
 
-        // $("#set_monster_id_0").click(function () { setMonster('0') });
-        // $("#set_monster_id_1").click(function () { setMonster('1') });
-        // $("#set_monster_id_2").click(function () { setMonster('2') });
-        // $("#set_monster_id_3").click(function () { setMonster('3') });
         $("#set_monster_id_0").on('touchstart click', function () { setMonster('0') });
         $("#set_monster_id_1").on('touchstart click', function () { setMonster('1') });
         $("#set_monster_id_2").on('touchstart click', function () { setMonster('2') });
@@ -562,8 +558,6 @@
             reloadSettings();
         };
 
-        // $("#do_dungeon_true").click(function () { setDoDungeon(true) });
-        // $("#do_dungeon_false").click(function () { setDoDungeon(false) });
         $("#do_dungeon_true").on('touchstart click', function () { setDoDungeon(true) });
         $("#do_dungeon_false").on('touchstart click', function () { setDoDungeon(false) });
 
@@ -573,8 +567,6 @@
             reloadSettings();
         };
 
-        // $("#set_dungeon_difficulty_normal").click(function () { setDungeonDifficulty("normal") });
-        // $("#set_dungeon_difficulty_advanced").click(function () { setDungeonDifficulty("advanced") });
         $("#set_dungeon_difficulty_normal").on('touchstart click', function () { setDungeonDifficulty("normal") });
         $("#set_dungeon_difficulty_advanced").on('touchstart click', function () { setDungeonDifficulty("advanced") });
 
@@ -584,8 +576,6 @@
             reloadSettings();
         };
 
-        // $("#do_arena_true").click(function () { setDoArena(true) });
-        // $("#do_arena_false").click(function () { setDoArena(false) });
         $("#do_arena_true").on('touchstart click', function () { setDoArena(true) });
         $("#do_arena_false").on('touchstart click', function () { setDoArena(false) });
 
@@ -595,9 +585,6 @@
             reloadSettings();
         };
 
-        // $("#set_arena_opponent_level_min").click(function () { setArenaOpponentLevel('min') });
-        // $("#set_arena_opponent_level_max").click(function () { setArenaOpponentLevel('max') });
-        // $("#set_arena_opponent_level_random").click(function () { setArenaOpponentLevel('random') });
         $("#set_arena_opponent_level_min").on('touchstart click', function () { setArenaOpponentLevel('min') });
         $("#set_arena_opponent_level_max").on('touchstart click', function () { setArenaOpponentLevel('max') });
         $("#set_arena_opponent_level_random").on('touchstart click', function () { setArenaOpponentLevel('random') });
@@ -608,8 +595,6 @@
             reloadSettings();
         };
 
-        // $("#do_circus_true").click(function () { setDoCircus(true) });
-        // $("#do_circus_false").click(function () { setDoCircus(false) });
         $("#do_circus_true").on('touchstart click', function () { setDoCircus(true) });
         $("#do_circus_false").on('touchstart click', function () { setDoCircus(false) });
 
@@ -619,9 +604,6 @@
             reloadSettings();
         };
 
-        // $("#set_circus_opponent_level_min").click(function () { setCircusOpponentLevel('min') });
-        // $("#set_circus_opponent_level_max").click(function () { setCircusOpponentLevel('max') });
-        // $("#set_circus_opponent_level_random").click(function () { setCircusOpponentLevel('random') });
         $("#set_circus_opponent_level_min").on('touchstart click', function () { setCircusOpponentLevel('min') });
         $("#set_circus_opponent_level_max").on('touchstart click', function () { setCircusOpponentLevel('max') });
         $("#set_circus_opponent_level_random").on('touchstart click', function () { setCircusOpponentLevel('random') });
@@ -632,8 +614,6 @@
             reloadSettings();
         };
 
-        // $("#do_quests_true").click(function () { setDoQuests(true) });
-        // $("#do_quests_false").click(function () { setDoQuests(false) });
         $("#do_quests_true").on('touchstart click', function () { setDoQuests(true) });
         $("#do_quests_false").on('touchstart click', function () { setDoQuests(false) });
 
@@ -643,12 +623,6 @@
             reloadSettings();
         };
 
-        // $("#do_combat_quests").click(function () { setQuestTypes('combat') });
-        // $("#do_arena_quests").click(function () { setQuestTypes('arena') });
-        // $("#do_circus_quests").click(function () { setQuestTypes('circus') });
-        // $("#do_expedition_quests").click(function () { setQuestTypes('expedition') });
-        // $("#do_dungeon_quests").click(function () { setQuestTypes('dungeon') });
-        // $("#do_items_quests").click(function () { setQuestTypes('items') });
         $("#do_combat_quests").on('touchstart click', function () { setQuestTypes('combat') });
         $("#do_arena_quests").on('touchstart click', function () { setQuestTypes('arena') });
         $("#do_circus_quests").on('touchstart click', function () { setQuestTypes('circus') });
@@ -662,8 +636,6 @@
             reloadSettings();
         };
 
-        // $("#do_event_expedition_true").click(function () { setDoEventExpedition(true) });
-        // $("#do_event_expedition_false").click(function () { setDoEventExpedition(false) });
         $("#do_event_expedition_true").on('touchstart click', function () { setDoEventExpedition(true) });
         $("#do_event_expedition_false").on('touchstart click', function () { setDoEventExpedition(false) });
 
@@ -673,10 +645,6 @@
             reloadSettings();
         };
 
-        // $("#set_event_monster_id_0").click(function () { setEventMonster('0') });
-        // $("#set_event_monster_id_1").click(function () { setEventMonster('1') });
-        // $("#set_event_monster_id_2").click(function () { setEventMonster('2') });
-        // $("#set_event_monster_id_3").click(function () { setEventMonster('3') });
         $("#set_event_monster_id_0").on('touchstart click', function () { setEventMonster('0') });
         $("#set_event_monster_id_1").on('touchstart click', function () { setEventMonster('1') });
         $("#set_event_monster_id_2").on('touchstart click', function () { setEventMonster('2') });
@@ -688,21 +656,38 @@
             reloadSettings();
         };
 
-        // $("#eat_food_true").click(function () { setEatFood(true) });
-        // $("#eat_food_false").click(function () { setEatFood(false) });
         $("#eat_food_true").on('touchstart click', function () { setEatFood(true) });
         $("#eat_food_false").on('touchstart click', function () { setEatFood(false) });
 
-        function setSaveGold(bool) {
-            saveGold = bool;
-            localStorage.setItem('saveGold', bool);
+        function setSaveGold(amount) {
+            if (amount === '100') {
+                saveGold = true;
+                localStorage.setItem('saveGold', true);
+                saveGoldAmount = 100000;
+                localStorage.setItem('saveGoldAmount', 100000);
+                saveGoldState = 0;
+                localStorage.setItem('saveGoldState', 0);
+            } else if (amount === '250') {
+                saveGold = true;
+                localStorage.setItem('saveGold', true);
+                saveGoldAmount = 250000;
+                localStorage.setItem('saveGoldAmount', 250000);
+                saveGoldState = 0;
+                localStorage.setItem('saveGoldState', 0);
+            } else {
+                saveGold = false;
+                localStorage.setItem('saveGold', false);
+                saveGoldAmount = 0;
+                localStorage.setItem('saveGoldAmount', 0);
+                saveGoldState = 0;
+                localStorage.setItem('saveGoldState', 0);
+            }
             reloadSettings();
         };
 
-        // $("#save_gold_true").click(function () { setSaveGold(true) });
-        // $("#save_gold_false").click(function () { setSaveGold(false) });
-        $("#save_gold_true").on('touchstart click', function () { setSaveGold(true) });
-        $("#save_gold_false").on('touchstart click', function () { setSaveGold(false) });
+        $("#save_gold_0").on('touchstart click', function () { setSaveGold('0') });
+        $("#save_gold_100").on('touchstart click', function () { setSaveGold('100') });
+        $("#save_gold_250").on('touchstart click', function () { setSaveGold('250') });
 
         function reloadSettings() {
             closeSettings();
@@ -743,8 +728,9 @@
             $(`#eat_food_${eatFood}`).addClass('active');
 
             $('#gold_settings').addClass(saveGold ? 'active' : 'inactive');
-            $(`#save_gold_${saveGold}`).addClass('active');
-
+            for (let i of ['0', '100', '250']) {
+                $(`#save_gold_${i}`).addClass(saveGoldAmount / 1000 === Number(i) ? 'active' : 'inactive');
+            }
         };
 
         setActiveButtons();
@@ -866,6 +852,11 @@
     function setSaveGoldItemHash(value) {
         saveGoldItemHash = value;
         localStorage.setItem('saveGoldItemHash', value);
+    }
+
+    function setSaveGoldItemLevel(value) {
+        saveGoldItemLevel = value;
+        localStorage.setItem('saveGoldItemLevel', value);
     }
 
     /****************
@@ -1002,117 +993,149 @@
         };
 
         if (!pauseToEat && saveGold) {
-            // Save Gold
-            if (!pauseToSaveGold) {
-                setPauseToSaveGold(true);
-            }
-
-            const inGuildPage = $("body").first().attr("id") === "guildPage";
-            const inGuildMarketPage = $("body").first().attr("id") === "guildMarketPage";
-            const inPackagesPage = $("body").first().attr("id") === "packagesPage";
-            console.log("In Guild Page: " + inGuildPage);
-            console.log("In Guild Market Page: " + inGuildMarketPage);
-            console.log("In Packages Page: " + inPackagesPage);
-            console.log("Save Gold State: " + saveGoldState);
-
-            if (!inGuildPage && !inGuildMarketPage && !inPackagesPage) {
-                // Go to guild page
-                setTimeout(function () {
-                    $("#mainmenu a.menuitem")[2].click();
-                }, clickDelay * 4);
-                setSaveGoldState(0);
-
-            } else if (inGuildPage) {
-                // Go to guild market
-                const linkGuildMarket = document.getElementById('guild_market_div');
-                setTimeout(function () {
-                    linkGuildMarket.click();
-                }, clickDelay * 2);
-            } else if (inGuildMarketPage && saveGoldState === 0) {
-                // Buy the first item with the 
-                // Available Gold
-                console.log("Gold: " + player.gold);
-
-                // Select the table from the DOM
-                let table = document.getElementById('market_item_table');
-
-                // find the row with the item that can be bought
-                for (let row of table.rows) {
-                    // Skip the first row (header)
-                    if (row.rowIndex === 0) {
-                        continue;
-                    }
-
-                    // Check if the item can be bought
-                    if (row.cells[5].querySelector('input').value === "Cancel") {
-                        continue;
-                    }
-
-                    // Check the price of the item
-                    let price = parseInt(row.cells[2].textContent.trim().replace('.', ''));
-                    console.log("Price: " + price);
-
-                    // Check if the price and market fee (4%) is less than the player's gold
-                    if (price * 1.04 < player.gold) {
-                        let itemDataHash = row.cells[0].querySelector("[class^='item-']").getAttribute('data-hash');
-                        // setSaveGoldItemHash(itemDataHash);
-                        console.log("Item Data Hash: " + itemDataHash);
-                        // Buy the item
-                        setTimeout(function () {
-                            row.cells[5].querySelector('input').click();
-                        }, clickDelay * 3);
-                        break;
-                    }
+            if (player.gold < saveGoldAmount * 1.04 && saveGoldState === 0) {
+                // Not enough gold and not in the process of saving gold
+                console.log("Not enough gold: " + player.gold + " < " + saveGoldAmount * 1.04);
+                if (pauseToSaveGold) {
+                    setPauseToSaveGold(false);
                 }
-                setSaveGoldState(1);
-
-                // const linkGuildMarket = document.querySelector('a.awesome-tabs.current');
-                // setTimeout(function () {
-                //     linkGuildMarket.click();
-                // }, clickDelay * 2);
-            } else if (inGuildMarketPage && saveGoldState === 1) {
-                // Go to packages page
-                const linkPackages = document.getElementById('menue_packages');
-                setTimeout(function () {
-                    linkPackages.click();
-                }, clickDelay * 2);
-            } else if (inPackagesPage && saveGoldState === 1) {
-                // Retrieve the first package
-                let packagesDiv = document.getElementById('packages');
-                let packageItems = packagesDiv.querySelectorAll('.packageItem');
-                let packageItem = packageItems[0].querySelector("[class^='item-']");
-                let itemDataHash = packageItem.getAttribute('data-hash');
-
-                setSaveGoldItemHash(itemDataHash);
-                console.log("Item: " + itemDataHash);
-
-                // Go back to guild market
-                setTimeout(function () {
-                    $("#mainmenu a.menuitem")[2].click();
-                }, clickDelay * 4);
-            } else if (inGuildMarketPage && saveGoldState === 2) {
-                // Sell Package for the same price
-
-                // Find item based on data hash
-                let InventoryDiv = document.getElementById('inv');
-                let InventoryDivList = InventoryDiv.getElementsByTagName('div');
-
-                console.log("Searching for item: " + saveGoldItemHash);
-                for (let item of InventoryDivList) {
-                    console.log("Item: " + item.getAttribute('data-hash'));
-                    if (item.getAttribute('data-hash') === saveGoldItemHash) {
-                        console.log("Found item: " + item.getAttribute('data-hash'));
-                        setTimeout(function () {
-                            item.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
-                        }, clickDelay * 2);
-                        break;
-                    }
-                }
-
-                setSaveGoldState(0);
-                setPauseToSaveGold(false);
             } else {
-                // setPauseToSaveGold(false);
+                // Enough gold and not in the process of saving gold
+                console.log("Enough gold: " + player.gold + " >= " + saveGoldAmount * 1.04);
+                console.log("Starting to save gold.")
+                if (!pauseToSaveGold) {
+                    setPauseToSaveGold(true);
+                }
+
+                const inGuildPage = $("body").first().attr("id") === "guildPage";
+                const inGuildMarketPage = $("body").first().attr("id") === "guildMarketPage";
+                const inPackagesPage = $("body").first().attr("id") === "packagesPage";
+                console.log("In Guild Page: " + inGuildPage);
+                console.log("In Guild Market Page: " + inGuildMarketPage);
+                console.log("In Packages Page: " + inPackagesPage);
+                console.log("Save Gold State: " + saveGoldState);
+
+                if (!inGuildPage && !inGuildMarketPage && !inPackagesPage) {
+                    // Go to guild page
+                    setTimeout(function () {
+                        $("#mainmenu a.menuitem")[2].click();
+                    }, clickDelay * 2);
+                } else if (inGuildPage) {
+                    // Go to guild market
+                    const linkGuildMarket = document.getElementById('guild_market_div');
+                    setTimeout(function () {
+                        linkGuildMarket.click();
+                    }, clickDelay * 2);
+                } else if (inGuildMarketPage && saveGoldState === 0) {
+                    // Buy the first item with value equal to saveGoldAmount
+                    console.log("Buying item with value: " + saveGoldAmount);
+
+                    // Select the table from the DOM
+                    let table = document.getElementById('market_item_table');
+
+                    // find the row with the item that can be bought
+                    for (let row of table.rows) {
+                        // Skip the first row (header)
+                        if (row.rowIndex === 0) {
+                            continue;
+                        }
+
+                        // Check if the item can be bought
+                        if (row.cells[5].querySelector('input').value === "Cancel") {
+                            continue;
+                        }
+
+                        // Check the price of the item
+                        let price = parseInt(row.cells[2].textContent.trim().replace('.', ''));
+                        console.log("Price: " + price);
+
+                        // Check if the price and market fee (4%) is less than the player's gold
+                        if (price === saveGoldAmount && price * 1.04 < player.gold) {
+                            console.log("Found item to buy.");
+                            let itemDataHash = row.cells[0].querySelector("[class^='item-']").getAttribute('data-hash');
+                            let itemLevel = Number(row.cells[0].querySelector("[class^='item-']").getAttribute('data-level'));
+                            console.log("Item Data Hash: " + itemDataHash);
+                            console.log("Item Level: " + itemLevel);
+                            setSaveGoldItemLevel(itemLevel);
+                            setSaveGoldState(1);
+                            // Buy the item
+                            setTimeout(function () {
+                                row.cells[5].querySelector('input').click();
+                            }, clickDelay * 2);
+                            break;
+                        }
+                    }
+                } else if (inGuildMarketPage && saveGoldState === 1) {
+                    // Item was bought, go to packages to retrieve
+                    const linkPackages = document.getElementById('menue_packages');
+                    setTimeout(function () {
+                        linkPackages.click();
+                    }, clickDelay * 2);
+                } else if (inPackagesPage && saveGoldState === 1) {
+                    // Retrieve the first package
+                    let packagesDiv = document.getElementById('packages');
+                    let packageItems = packagesDiv.querySelectorAll('.packageItem');
+                    let packageItem = packageItems[0].querySelector("[class^='item-']");
+                    let itemDataHash = packageItem.getAttribute('data-hash');
+                    let itemLevel = Number(packageItem.getAttribute('data-level'));
+
+                    console.log("Searching for hash: " + saveGoldItemHash);
+                    console.log("Searching for level: " + saveGoldItemLevel);
+
+                    console.log("Item Data Hash: " + itemDataHash);
+                    console.log("Item Level: " + itemLevel);
+
+                    if (itemLevel === saveGoldItemLevel) {
+                        setTimeout(function () {
+                            packageItem.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+                        }, clickDelay * 2);
+
+                        setSaveGoldState(2);
+                        setSaveGoldItemHash(itemDataHash);
+                        console.log("Retrieved Item: " + itemDataHash);
+
+                        // Go back to guild market
+                        setTimeout(function () {
+                            $("#mainmenu a.menuitem")[2].click();
+                        }, clickDelay * 4);
+                    } else {
+                        console.log("Item level does not match...");
+                    }
+                } else if (inGuildMarketPage && saveGoldState === 2) {
+                    // Sell Package for the same price
+
+                    // Find item based on data hash
+                    let InventoryDiv = document.getElementById('inv');
+                    let InventoryDivList = InventoryDiv.getElementsByTagName('div');
+
+                    console.log("Searching for hash: " + saveGoldItemHash);
+                    console.log("Searching for level: " + saveGoldItemLevel);
+                    for (let item of InventoryDivList) {
+                        console.log("Item hash: " + item.getAttribute('data-hash'));
+                        console.log("Item level: " + item.getAttribute('data-level'));
+                        if (item.getAttribute('data-hash') === saveGoldItemHash && Number(item.getAttribute('data-level')) === saveGoldItemLevel) {
+                            console.log("Found item hash: " + item.getAttribute('data-hash'));
+                            console.log("Found item level: " + item.getAttribute('data-level'));
+                            setTimeout(function () {
+                                item.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+                            }, clickDelay * 2);
+
+                            setTimeout(function () {
+                                let marketPriceInput = document.getElementById('preis');
+                                marketPriceInput.value = saveGoldAmount;
+                                let marketDurationInput = document.getElementById('dauer');
+                                marketDurationInput.value = "3";
+                                let marketButton = document.querySelector('input[type="submit"][name="anbieten"]');
+                                marketButton.click();
+                            }, clickDelay * 4);
+                            break;
+                        }
+                    }
+                    setSaveGoldState(0);
+                    setPauseToSaveGold(false);
+                } else {
+                    // setPauseToSaveGold(false);
+                }
             }
         }
 
@@ -1120,7 +1143,7 @@
         /****************
         * Handle Quests *
         ****************/
-        if (!pauseToEat && doQuests === true && nextQuestTime < currentTime) {
+        if (!pauseToEat && !pauseToSaveGold && doQuests === true && (nextQuestTime < currentTime)) {
             function completeQuests() {
                 const inPanteonPage = $("body").first().attr("id") === "questsPage";
 
@@ -1351,22 +1374,25 @@
                     nextQuestTime = currentTime + nextQuestIn
                     localStorage.setItem('nextQuestTime', nextQuestTime)
                 } else {
-                    nextQuestTime = currentTime + 300000;
+                    nextQuestTime = currentTime + 360000;
                     localStorage.setItem('nextQuestTime', nextQuestTime)
                 }
                 autoGo();
             }
 
+            // const inPanteonPage = $("body").first().attr("id") === "questsPage";
+            // if (inPanteonPage || (nextQuestTime < currentTime)) {
             setTimeout(function () {
                 completeQuests();
             }, clickDelay);
+            // }
         }
 
         /****************
         * Go Expedition *
         ****************/
 
-        else if (!pauseToEat && doExpedition === true && document.getElementById("cooldown_bar_fill_expedition").classList.contains("cooldown_bar_fill_ready") === true) {
+        else if (!pauseToEat && !pauseToSaveGold && doExpedition === true && document.getElementById("cooldown_bar_fill_expedition").classList.contains("cooldown_bar_fill_ready") === true) {
             function goExpedition() {
                 const inExpeditionPage = $("body").first().attr("id") === "locationPage";
                 const inEventExpeditionPage = document.getElementById("content").getElementsByTagName('img')[1].getAttribute('src') === 'img/ui/expedition_points2.png';
@@ -1388,7 +1414,7 @@
         * Go Dungeon  *
         **************/
 
-        else if (!pauseToEat && doDungeon === true && document.getElementById("cooldown_bar_fill_dungeon").classList.contains("cooldown_bar_fill_ready") === true) {
+        else if (!pauseToEat && !pauseToSaveGold && doDungeon === true && document.getElementById("cooldown_bar_fill_dungeon").classList.contains("cooldown_bar_fill_ready") === true) {
             function goDungeon() {
                 const inDungeonPage = $("body").first().attr("id") === "dungeonPage";
 
@@ -1418,7 +1444,7 @@
         * Go Arena Provinciarum *
         ************************/
 
-        else if (!pauseToEat && doArena === true && document.getElementById("cooldown_bar_fill_arena").classList.contains("cooldown_bar_fill_ready") === true) {
+        else if (!pauseToEat && !pauseToSaveGold && doArena === true && document.getElementById("cooldown_bar_fill_arena").classList.contains("cooldown_bar_fill_ready") === true) {
             function goArena() {
                 const inArenaPage = document.getElementsByTagName("body")[0].id === "arenaPage";
 
@@ -1464,7 +1490,7 @@
         * Go Circus Provinciarum *
         *************************/
 
-        else if (!pauseToEat && doCircus === true && document.getElementById("cooldown_bar_fill_ct").classList.contains("cooldown_bar_fill_ready") === true) {
+        else if (!pauseToEat && !pauseToSaveGold && doCircus === true && document.getElementById("cooldown_bar_fill_ct").classList.contains("cooldown_bar_fill_ready") === true) {
             function goCircus() {
                 const inArenaPage = document.getElementsByTagName("body")[0].id === "arenaPage";
 
@@ -1508,7 +1534,7 @@
         *  Go Event Expedition  *
         ************************/
 
-        else if (!pauseToEat && doEventExpedition === true && nextEventExpeditionTime < currentTime && eventPoints > 0) {
+        else if (!pauseToEat && !pauseToSaveGold && doEventExpedition === true && nextEventExpeditionTime < currentTime && eventPoints > 0) {
             function goEventExpedition() {
                 const inEventExpeditionPage = document.getElementById("submenu2").getElementsByClassName("menuitem active glow")[0];
 
@@ -1562,7 +1588,7 @@
             *    Fast Mode    *
             ******************/
 
-            if (!pauseToEat && safeMode === false) {
+            if (!pauseToEat && !pauseToSaveGold && safeMode === false) {
                 const actions = [];
 
                 if (doExpedition === true) {
@@ -1614,6 +1640,16 @@
                         index: 4,
                     });
                 };
+
+                if (doQuests === true) {
+                    const timeTo = localStorage.getItem('nextQuestTime') - currentTime;
+
+                    actions.push({
+                        name: 'quests',
+                        time: timeTo,
+                        index: 5,
+                    });
+                }
 
                 function getNextAction(actions) {
                     let index = 0;
@@ -1696,8 +1732,11 @@
                     if (nextAction.time <= 0) {
                         if (nextAction.index === 4) {
                             document.getElementById("submenu2").getElementsByClassName("menuitem glow")[0].click();
-                        }
-                        else {
+                        } else if (nextAction.index === 5) {
+                            setTimeout(function () {
+                                $("#mainmenu a.menuitem")[1].click();
+                            }, clickDelay);
+                        } else {
                             setTimeout(function () {
                                 document.getElementsByClassName("cooldown_bar_link")[nextAction.index].click();
                             }, clickDelay);
