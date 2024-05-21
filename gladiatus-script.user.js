@@ -888,7 +888,7 @@
         *   Use Food   *
         ***************/
 
-        if (player.hp < 50 && eatFood) {
+        if (player.hp < 50) {
             console.log("Low health");
             //In case of low health, pause everything and eat food
             if (!pauseToEat) {
@@ -969,28 +969,33 @@
                 };
             } else {
                 setpauseToEat(false);
-                if (!doExpedition) {
+                if (doExpedition) {
                     setDoExpedition(false);
                 }
-                if (!doArena) {
+                if (doArena) {
                     setDoArena(false);
                 }
-                setTimeout(function () {
-                    $("#mainmenu a.menuitem")[1].click();
-                }, clickDelay * 3);
+                if (!doDungeon) {
+                    setTimeout(function () {
+                        $("#mainmenu a.menuitem")[1].click();
+                    }, clickDelay * 2);
+                }
             };
-        }
-
-        if (player.hp > 60) {
+        } else if (player.hp > 60) {
             // Remove low health alert
-            if (document.getElementById("lowHealth")) {
-                document.getElementById("lowHealth").remove();
-            };
+            // if (document.getElementById("lowHealth")) {
+            //     document.getElementById("lowHealth").remove();
+            // };
 
             if (pauseToEat) {
                 setpauseToEat(false);
             }
+        } else {
         };
+
+        /****************
+         *  Save Gold   *
+        ****************/
 
         if (!pauseToEat && saveGold) {
             if (player.gold < saveGoldAmount * 1.04 && saveGoldState === 0) {
@@ -1131,14 +1136,44 @@
                             break;
                         }
                     }
+                    setSaveGoldState(3);
+
+                } else if (saveGoldState === 3) {
+                    // Gold saving is done
                     setSaveGoldState(0);
                     setPauseToSaveGold(false);
-                } else {
-                    // setPauseToSaveGold(false);
+                    // Stop expeditions if the available expedition points are not enough to reach saveGoldAmount
+                    if (!enoughExpeditionPoints()) {
+                        setDoExpedition(false);
+                    }
                 }
             }
         }
 
+        function enoughExpeditionPoints() {
+            let expeditionPoints = Number(document.getElementById('expeditionpoints_value_point').innerText);
+            let expeditionPointsNeeded = Math.ceil((saveGoldAmount - player.gold) / 10000);
+            console.log("Expedition Points: " + expeditionPoints);
+            console.log("Expedition Points Needed: " + expeditionPointsNeeded);
+            if (expeditionPoints < expeditionPointsNeeded) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        // Check if expedition points are enough to reach saveGoldAmount
+        if (enoughExpeditionPoints()) {
+            setDoExpedition(true);
+        }
+
+        // Start doing dungeons if the dungeon points are over 16
+        if (!doDungeon) {
+            let dungeonPoints = Number(document.getElementById('dungeonpoints_value_point').innerText);
+            if (dungeonPoints > 18) {
+                setDoDungeon(true);
+            }
+        }
 
         /****************
         * Handle Quests *
@@ -1215,18 +1250,40 @@
                 console.log('Active Quests: ' + activeQuests.length);
 
                 let activeDungeonQuests = 0;
+                let activeDungeonQuestsChoice = false;
+                let activeDungeonQuestsEach = false;
+                let activeDungeonQuestsBoss = false;
+                let numberOfOpponents = 0;
 
                 for (const quest of activeQuests) {
                     if (quest.getElementsByClassName("quest_slot_icon")[0].style.backgroundImage.includes('c903cea2513b6a20e1e92500c2a279')) {
                         activeDungeonQuests++;
+                        const questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
+                        if (questTitle.includes("each opponent")) {
+                            activeDungeonQuestsEach = true;
+                        } else if (questTitle.includes("boss")) {
+                            activeDungeonQuestsBoss = true;
+                        } else if (questTitle.includes("your choice")) {
+                            activeDungeonQuestsChoice = true;
+                            // Sasama`s last journey: Defeat 3 opponents of your choice
+                            numberOfOpponents = Number(questTitle.split("Defeat ")[1].split(" ")[0]);
+                        }
                     }
                 }
                 console.log('Active Dungeon Quests: ' + activeDungeonQuests);
-                if (activeDungeonQuests < 2) {
+                console.log('Defeat the boss: ' + activeDungeonQuestsBoss);
+                console.log('Defeat each opponent: ' + activeDungeonQuestsEach);
+                console.log('Defeat your choice: ' + activeDungeonQuestsChoice);
+
+                let dungeonPoints = Number(document.getElementById('dungeonpoints_value_point').innerText);
+
+                if (activeDungeonQuests < 2 || dungeonPoints < 12) {
                     setDoDungeon(false);
-                } else {
+                } else if (activeDungeonQuests === 3) {
                     setDoDungeon(true);
-                };
+                } else if (activeDungeonQuestsChoice && numberOfOpponents > 3 && activeDungeonQuestsEach) {
+                    setDoDungeon(true);
+                }
             }
 
             function takeQuest() {
@@ -1346,7 +1403,7 @@
                                 let experienceReward = getQuestExperience(quest);
                                 let goldExperienceRatio = goldReward / experienceReward;
 
-                                if (goldExperienceRatio > 1000.0) {
+                                if (goldExperienceRatio > 800.0) {
                                     console.log('Combat/Items quest accepted');
                                     return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
                                 }
@@ -1374,7 +1431,7 @@
                     nextQuestTime = currentTime + nextQuestIn
                     localStorage.setItem('nextQuestTime', nextQuestTime)
                 } else {
-                    nextQuestTime = currentTime + 360000;
+                    nextQuestTime = currentTime + 180000;
                     localStorage.setItem('nextQuestTime', nextQuestTime)
                 }
                 autoGo();
