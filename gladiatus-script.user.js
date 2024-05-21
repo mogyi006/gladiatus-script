@@ -1170,7 +1170,7 @@
         // Start doing dungeons if the dungeon points are over 16
         if (!doDungeon) {
             let dungeonPoints = Number(document.getElementById('dungeonpoints_value_point').innerText);
-            if (dungeonPoints > 18) {
+            if (dungeonPoints > 14) {
                 setDoDungeon(true);
             }
         }
