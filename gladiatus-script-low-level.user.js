@@ -5,8 +5,8 @@
 // @author       Eryk Bodziony
 // @match        *://*.gladiatus.gameforge.com/game/index.php*
 // @exclude      *://*.gladiatus.gameforge.com/game/index.php?mod=start
-// @downloadURL  https://github.com/mogyi006/gladiatus-script/raw/master/gladiatus-script.js
-// @updateURL    https://github.com/mogyi006/gladiatus-script/raw/master/gladiatus-script.js
+// @downloadURL  https://github.com/mogyi006/gladiatus-script/raw/master/gladiatus-script-low-level.js
+// @updateURL    https://github.com/mogyi006/gladiatus-script/raw/master/gladiatus-script-low-level.js
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js
@@ -1344,18 +1344,6 @@
                 console.log('Defeat the boss: ' + activeDungeonQuestsBoss);
                 console.log('Defeat each opponent: ' + activeDungeonQuestsEach);
                 console.log('Defeat your choice: ' + activeDungeonQuestsChoice);
-
-                let dungeonPoints = Number(document.getElementById('dungeonpoints_value_point').innerText);
-
-                if (activeDungeonQuests < 2 || dungeonPoints < 8) {
-                    setDoDungeon(false);
-                } else if (activeDungeonQuests === 3) {
-                    setDoDungeon(true);
-                } else if (activeDungeonQuestsChoice && numberOfOpponents > 3 && activeDungeonQuestsEach) {
-                    setDoDungeon(true);
-                } else if (activeDungeonQuestsEach) {
-                    setDoDungeon(true);
-                }
             }
 
             function takeQuest() {
@@ -1371,11 +1359,9 @@
                         // Div Sample: <div class="quest_slot_title">Cliff Jumper: Defeat 5 opponents of your choice</div>
                         const questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
 
-                        if (questTitle.includes("Mine") && questTitle.includes("your choice")) {
-                            return 0;
-                        } else if (questTitle.includes("Teuton Camp") && questTitle.includes("your choice")) {
+                        if (questTitle.includes("your choice")) {
                             return 1;
-                        } else if (questTitle.includes("the boss")) {
+                        } else if (questTitle.includes("Teuton Camp") && questTitle.includes("your choice")) {
                             return 1;
                         } else {
                             return 0;
@@ -1385,17 +1371,17 @@
                     function getDungeonQuestType(quest) {
                         // Determines the type of dungeon quest
                         const questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
-
-                        if (questTitle.includes("Externsteine")) {
-                            let goldReward = getQuestReward(quest);
-                            if (goldReward > 5000) {
-                                return 1;
-                            } else {
-                                return 0;
-                            }
-                        } else {
-                            return 0;
-                        }
+                        return 1;
+                        // if (questTitle.includes("Externsteine")) {
+                        //     let goldReward = getQuestReward(quest);
+                        //     if (goldReward > 5000) {
+                        //         return 1;
+                        //     } else {
+                        //         return 0;
+                        //     }
+                        // } else {
+                        //     return 0;
+                        // }
                     }
 
                     function getQuestReward(quest) {
@@ -1558,13 +1544,7 @@
                                     console.log('Expedition quest accepted');
                                     return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
                                 }
-                                // } else if (icon === 'combat' || icon === 'items' || icon === 'arena') {
-                                //     // Only accept quests with underworld items
-                                //     if (isUnderworldItem(quest)) {
-                                //         console.log('Combat/Items/Arena quest accepted');
-                                //         return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
-                                //     }
-                            } else if (icon === 'combat' || icon === 'items') {
+                            } else if (icon === 'combat' || icon === 'items' || icon === 'arena' || icon === 'circus') {
                                 // Only accept combat/items quests with a gold/experience ratio greater than 1500
                                 let goldReward = getQuestReward(quest);
                                 let experienceReward = getQuestExperience(quest);
@@ -1572,7 +1552,7 @@
 
                                 let godReward = getQuestGodReward(quest);
 
-                                if (goldExperienceRatio > 2000.0 && godReward > 0) {
+                                if (goldExperienceRatio > 0) {
                                     console.log('Combat/Items quest accepted');
                                     return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
                                 }
