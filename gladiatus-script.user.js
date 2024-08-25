@@ -87,6 +87,12 @@
     if (localStorage.getItem('pauseToEat')) {
         pauseToEat = localStorage.getItem('pauseToEat') === "true" ? true : false;
     };
+    // Queue of expeditions to do: location + number of times to do it
+    let expeditionQueue = [];
+    if (localStorage.getItem('expeditionQueue')) {
+        expeditionQueue = JSON.parse(localStorage.getItem('expeditionQueue'));
+    }
+
 
     // Dungeon
 
@@ -220,7 +226,9 @@
         saveGold: 'Save Gold',
         100: '100',
         250: '250',
-        500: '500'
+        500: '500',
+        750: '750',
+        1000: '1M',
     }
 
     const contentPL = {
@@ -251,7 +259,9 @@
         saveGold: 'Save Gold',
         100: '100',
         250: '250',
-        500: '500'
+        500: '500',
+        750: '750',
+        1000: '1M',
     }
 
     const contentES = {
@@ -282,7 +292,9 @@
         saveGold: 'Save Gold',
         100: '100',
         250: '250',
-        500: '500'
+        500: '500',
+        750: '750',
+        1000: '1M',
     }
 
     let content;
@@ -494,6 +506,8 @@
                             <div id="save_gold_100" class="settingsButton">${content[100]}</div>
                             <div id="save_gold_250" class="settingsButton">${content[250]}</div>
                             <div id="save_gold_500" class="settingsButton">${content[500]}</div>
+                            <div id="save_gold_750" class="settingsButton">${content[750]}</div>
+                            <div id="save_gold_1000" class="settingsButton">${content[1000]}</div>
                         </div>
                     </div>
                 </div>`;
@@ -685,7 +699,22 @@
                 localStorage.setItem('saveGoldAmount', 500000);
                 saveGoldState = 0;
                 localStorage.setItem('saveGoldState', 0);
-            } else {
+            } else if (amount === '750') {
+                saveGold = true;
+                localStorage.setItem('saveGold', true);
+                saveGoldAmount = 750000;
+                localStorage.setItem('saveGoldAmount', 750000);
+                saveGoldState = 0;
+                localStorage.setItem('saveGoldState', 0);
+            } else if (amount === '1000') {
+                saveGold = true;
+                localStorage.setItem('saveGold', true);
+                saveGoldAmount = 1000000;
+                localStorage.setItem('saveGoldAmount', 1000000);
+                saveGoldState = 0;
+                localStorage.setItem('saveGoldState', 0);
+            }
+            else {
                 saveGold = false;
                 localStorage.setItem('saveGold', false);
                 saveGoldAmount = 0;
@@ -700,6 +729,8 @@
         $("#save_gold_100").on('touchstart click', function () { setSaveGold('100') });
         $("#save_gold_250").on('touchstart click', function () { setSaveGold('250') });
         $("#save_gold_500").on('touchstart click', function () { setSaveGold('500') });
+        $("#save_gold_750").on('touchstart click', function () { setSaveGold('750') });
+        $("#save_gold_1000").on('touchstart click', function () { setSaveGold('1000') });
 
         function reloadSettings() {
             closeSettings();
@@ -740,7 +771,7 @@
             $(`#eat_food_${eatFood}`).addClass('active');
 
             $('#gold_settings').addClass(saveGold ? 'active' : 'inactive');
-            for (let i of ['0', '100', '250', '500']) {
+            for (let i of ['0', '100', '250', '500', '750', '1000']) {
                 $(`#save_gold_${i}`).addClass(saveGoldAmount / 1000 === Number(i) ? 'active' : 'inactive');
             }
         };
@@ -831,6 +862,11 @@
         setpauseToEat(false);
     };
 
+    function setExpeditionQueue(queue) {
+        expeditionQueue = queue;
+        localStorage.setItem('expeditionQueue', JSON.stringify(queue));
+    };
+
     function setpauseToEat(bool) {
         pauseToEat = bool;
         localStorage.setItem('pauseToEat', bool);
@@ -874,6 +910,11 @@
     function setSaveGoldAmount(value) {
         saveGoldAmount = value;
         localStorage.setItem('saveGoldAmount', value);
+    }
+
+    function setSaveGold(bool) {
+        saveGold = bool;
+        localStorage.setItem('saveGold', bool);
     }
 
     /****************
@@ -1032,7 +1073,7 @@
                     }, clickDelay * 2);
                 }
             };
-        } else if (player.hp > 50) {
+        } else if (player.hp > 49) {
             // Remove low health alert
             // if (document.getElementById("lowHealth")) {
             //     document.getElementById("lowHealth").remove();
@@ -1125,7 +1166,13 @@
                     // No item found to buy at the saveGoldAmount price
                     // Set the saveGoldAmount lower
                     if (saveGoldState === 0) {
-                        if (saveGoldAmount === 500000) {
+                        if (saveGoldAmount === 1000000) {
+                            setSaveGoldState(0);
+                            setSaveGoldAmount(750000);
+                        } else if (saveGoldAmount === 750000) {
+                            setSaveGoldState(0);
+                            setSaveGoldAmount(500000);
+                        } else if (saveGoldAmount === 500000) {
                             setSaveGoldState(0);
                             setSaveGoldAmount(250000);
                         } else if (saveGoldAmount === 250000) {
@@ -1134,6 +1181,7 @@
                         } else {
                             setSaveGoldAmount(0);
                             setPauseToSaveGold(false);
+                            setSaveGold(false);
                         }
                         // Refresh the page to get the latest items
                         setTimeout(function () {
@@ -1213,9 +1261,9 @@
                     setSaveGoldState(0);
                     setPauseToSaveGold(false);
                     // Stop expeditions if the available expedition points are not enough to reach saveGoldAmount
-                    if (!enoughExpeditionPoints()) {
-                        setDoExpedition(false);
-                    }
+                    // if (!enoughExpeditionPoints()) {
+                    //     setDoExpedition(false);
+                    // }
                 }
             }
         }
@@ -1244,6 +1292,51 @@
                 setDoDungeon(true);
             }
         }
+
+
+        // Reset quest timer if there are completed quests
+        function checkCompletedQuests() {
+            if (!pauseToEat && !pauseToSaveGold && $("body").first().attr("id") === "questsPage") {
+                const completedQuests = $("#content .contentboard_slot a.quest_slot_button_finish");
+                if (completedQuests.length) {
+                    nextQuestTime = currentTime - 1000;
+                    localStorage.setItem('nextQuestTime', nextQuestTime);
+                    setTimeout(function () {
+                        completedQuests[0].click();
+                    }, clickDelay);
+                }
+            }
+        }
+        checkCompletedQuests();
+
+
+        // Update the expedition queue
+        function updateExpeditonQueue() {
+            if ($("body").first().attr("id") === "questsPage") {
+                const activeQuests = $("#content .contentboard_slot_active");
+                const newQueue = [];
+
+                for (const quest of activeQuests) {
+                    if (quest.getElementsByClassName("quest_slot_icon")[0].style.backgroundImage.includes('a3d2065a1dac3029b15d5e64ce7a90')) {
+                        // Div Sample: <div class="quest_slot_title">Cliff Jumper: Defeat 5 opponents of your choice</div>
+                        const questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
+                        const questLocation = questTitle.split(":")[0].trim();
+                        if (questTitle.includes("boss")) {
+                            newQueue.push({ location: questLocation, times: 1 });
+                        } else if (questTitle.includes("your choice")) {
+                            // Check progress: <div class="quest_slot_progress">3 / 4</div>
+                            const progress = quest.getElementsByClassName("quest_slot_progress")[0].innerText;
+                            const progressCurrent = Number(progress.split(" / ")[0]);
+                            const progressTotal = Number(progress.split(" / ")[1]);
+                            newQueue.push({ location: questLocation, times: progressTotal - progressCurrent });
+                        }
+                    }
+                }
+                console.log('New Expedition Queue:' + newQueue);
+                setExpeditionQueue(newQueue);
+            }
+        }
+        updateExpeditonQueue();
 
         /****************
         * Handle Quests *
@@ -1374,6 +1467,8 @@
                         if (questTitle.includes("Mine") && questTitle.includes("your choice")) {
                             return 0;
                         } else if (questTitle.includes("Teuton Camp") && questTitle.includes("your choice")) {
+                            return 1;
+                        } else if (questTitle.includes("Koman Mountain") && questTitle.includes("your choice")) {
                             return 1;
                         } else if (questTitle.includes("the boss")) {
                             return 1;
@@ -1631,18 +1726,64 @@
                 if (!inExpeditionPage || inEventExpeditionPage) {
                     document.getElementsByClassName("cooldown_bar_link")[0].click();
                 } else {
-                    document.getElementsByClassName("expedition_button")[monsterId].click();
-                };
+                    // Current location: <a href="index.php?mod=location&amp;loc=7&amp;sh=38e12827038a096a39bd9813a68061b9" class="awesome-tabs current">Koman Mountain</a>
+                    const currentLocation = document.getElementById("mainnav").getElementsByClassName("awesome-tabs current")[0].innerText;
+
+                    // Select the highest active location from the expedition locations
+                    const locationElements = document.getElementById("submenu2").getElementsByClassName("menuitem");
+                    // Remove inactive locations
+                    const activeLocationElements = Array.from(locationElements).filter(locationElement => !locationElement.classList.contains("inactive"));
+                    const highestLocationElement = activeLocationElements[activeLocationElements.length - 1];
+                    const highestLocation = highestLocationElement.innerText.trim();
+
+                    // Do an expedition from the queue if there are any
+                    if (expeditionQueue.length) {
+                        let newQueue = expeditionQueue;
+                        const expeditionLocation = expeditionQueue[0].location;
+                        const expeditionTimes = expeditionQueue[0].times;
+
+                        if (expeditionLocation === currentLocation) {
+                            // Decrease the remaining times of the expedition
+                            newQueue[0].times = expeditionTimes - 1;
+                            setExpeditionQueue(newQueue);
+
+                            // Reset nextQuestTime if only one (or 0) expedition is left
+                            if (expeditionTimes < 2) {
+                                nextQuestTime = currentTime - 1000;
+                                localStorage.setItem('nextQuestTime', nextQuestTime);
+                            }
+
+                            if (expeditionTimes > 0) {
+                                // Do the expedition if we are at the correct location
+                                return document.getElementsByClassName("expedition_button")[monsterId].click();
+                            }
+                        } else {
+                            // Go to the expedition location
+                            for (const locationElement of activeLocationElements) {
+                                if (locationElement.innerText.trim() === expeditionLocation) {
+                                    return locationElement.click();
+                                }
+                            }
+                        }
+                    }
+
+                    if (currentLocation === highestLocation) {
+                        return document.getElementsByClassName("expedition_button")[monsterId].click();
+                    } else {
+                        // Go to the highest location
+                        return highestLocationElement.click();
+                    }
+                }
             };
 
             setTimeout(function () {
                 goExpedition();
             }, clickDelay);
 
+            // Reload expedition page in case of failed goExpedition() call
             setTimeout(function () {
                 document.getElementsByClassName("cooldown_bar_link")[0].click();
             }, clickDelay * 5);
-
         }
 
         /**************
@@ -1666,8 +1807,23 @@
                         }
                     } else {
                         const areaElements = document.getElementById("content").getElementsByTagName("area");
+                        const mapLabels = document.querySelectorAll('.map_label');
+
+                        // Go for boss if it is available and each opponent was attacked at least once
+                        if (mapLabels.length) {
+                            // Retreive the text content of the labels
+                            const mapLabelsText = Array.from(mapLabels).map(label => label.textContent.trim());
+                            const mapLabelsonClick = Array.from(mapLabels).map(label => label.getAttribute('onclick').split("'")[1]);
+
+                            // Go for boss
+                            if (mapLabelsText.includes("Boss") && (mapLabelsText.join().includes('1/2') || (mapLabelsText.join().includes('2/2') && mapLabels.length === 2))) {
+                                return mapLabels[mapLabelsText.indexOf("Boss")].click();
+                            }
+                        }
+
+                        // Go for the default opponent
                         const lastAreaElement = areaElements[areaElements.length - 1];
-                        lastAreaElement.click();
+                        return lastAreaElement.click();
                     };
                 };
             };
@@ -1675,6 +1831,11 @@
             setTimeout(function () {
                 goDungeon();
             }, clickDelay);
+
+            // Reload dungeon page in case of failed goDungeon() call
+            setTimeout(function () {
+                document.getElementsByClassName("cooldown_bar_link")[1].click();
+            }, clickDelay * 5);
         }
 
         /************************
