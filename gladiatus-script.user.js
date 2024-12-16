@@ -95,7 +95,6 @@
 
 
     // Dungeon
-
     let doDungeon = true;
     if (localStorage.getItem('doDungeon')) {
         doDungeon = localStorage.getItem('doDungeon') === "true" ? true : false;
@@ -104,9 +103,13 @@
         doDungeon = false;
     };
     let dungeonDifficulty = localStorage.getItem('dungeonDifficulty') === 'advanced' ? 'advanced' : 'normal';
+    // Dungeon queue
+    let dungeonQueue = 0;
+    if (localStorage.getItem('dungeonQueue')) {
+        dungeonQueue = Number(localStorage.getItem('dungeonQueue'));
+    }
 
     // Arena
-
     let doArena = true;
     if (localStorage.getItem('doArena')) {
         doArena = localStorage.getItem('doArena') === "true" ? true : false;
@@ -135,12 +138,15 @@
 
     // Event Expedition
 
-    let doEventExpedition = true;
+    let doEventExpedition = false;
     if (localStorage.getItem('doEventExpedition')) {
         doEventExpedition = localStorage.getItem('doEventExpedition') === "true" ? true : false;
     };
-    if (!document.getElementById("submenu2").getElementsByClassName("menuitem glow")[0]) {
-        doEventExpedition = false;
+
+    if (document.getElementById("submenu2")) {
+        if (!document.getElementById("submenu2").getElementsByClassName("menuitem glow")[0]) {
+            doEventExpedition = false;
+        }
     };
 
     let eventMonsterId = 0;
@@ -877,6 +883,11 @@
         localStorage.setItem('doDungeon', bool);
     };
 
+    function setDungeonQueue(value) {
+        dungeonQueue = value;
+        localStorage.setItem('dungeonQueue', value);
+    };
+
     function setDoEventExpedition(bool) {
         doEventExpedition = bool;
         localStorage.setItem('doEventExpedition', bool);
@@ -917,6 +928,67 @@
         localStorage.setItem('saveGold', bool);
     }
 
+    function getCountry() {
+        let country = "Unknown";
+        if (!document.getElementById("submenu2")) {
+            console.log("No locations found...");
+            return country;
+        }
+        const locationElements = document.getElementById("submenu2").getElementsByClassName("menuitem");
+        const locationNames = Array.from(locationElements).map((element) => element.innerText.trim());
+
+        if (locationNames.length > 0) {
+
+            if (locationNames.includes("Grimwood")) {
+                country = "Italy";
+            } else if (locationNames.includes("Voodoo Temple")) {
+                country = "Africa";
+            } else if (locationNames.includes("Cave Temple")) {
+                country = "Germania";
+            } else if (locationNames.includes("Bank of the Thames")) {
+                country = "Britannia";
+            } else if (locationNames.includes("Entrance to the Kingdom of the Dead")) {
+                country = "Underworld";
+            }
+
+            console.log("Country:", country);
+
+        } else {
+            console.log("No location names found...");
+        }
+
+        return country;
+    }
+
+    function setCountrySettings(country) {
+        if (country === "Italy") {
+            setDoExpedition(false);
+            setDoDungeon(false);
+            setEatFood(true);
+        } else if (country === "Africa") {
+            setDoExpedition(false);
+            setDoDungeon(false);
+            setEatFood(true);
+        } else if (country === "Germania") {
+            setDoExpedition(false);
+            // setDoDungeon(true);
+            setEatFood(true);
+        } else if (country === "Britannia") {
+            // setDoExpedition(true);
+            setDoDungeon(false);
+            setEatFood(true);
+        } else if (country === "Underworld") {
+            setDoExpedition(true);
+            setDoDungeon(false);
+            setEatFood(false); // No food in underworld
+        } else {
+            setDoExpedition(false);
+            setDoEventExpedition(false);
+            setDoDungeon(false);
+            setEatFood(false);
+        }
+    }
+
     /****************
     *    Auto Go    *
     ****************/
@@ -927,6 +999,33 @@
 
         const currentTime = new Date().getTime();
         const clickDelay = getRandomInt(900, 2400);
+
+        const country = getCountry();
+        setCountrySettings(country);
+
+        const inUnderworld = document.getElementById('wrapper_game').classList.contains('underworld');
+        if (inUnderworld) {
+            setDoExpedition(true);
+            setEatFood(false);
+        }
+
+        const cooldownBarDungeon = document.getElementById('cooldown_bar_dungeon');
+        const dungeonAvailable = cooldownBarDungeon.style.display !== 'none';
+        if (!dungeonAvailable) {
+            setDoDungeon(false);
+        }
+
+        const hpDiv = document.getElementById('header_values_hp_points');
+        const hpSpan = hpDiv.querySelector('span');
+
+        // Get the life points value
+        let lifePoints;
+        if (hpSpan) {
+            lifePoints = Number(hpSpan.textContent.trim().replace(/[^0-9]/gi, ''));
+        } else {
+            lifePoints = Number(hpDiv.childNodes[0].textContent.trim().replace(/[^0-9]/gi, ''));
+        }
+        console.log("Life Points: " + lifePoints);
 
         // Claim Daily Reward
         if (document.getElementById("blackoutDialogLoginBonus") !== null) {
@@ -942,11 +1041,30 @@
             }, clickDelay);
         };
 
+        // Thorough Search
+        if (document.getElementById("blackoutDialog") !== null) {
+            let lootButtons = document.querySelectorAll('.loot-button');
+            if (lootButtons.length > 0) {
+                setTimeout(function () {
+                    lootButtons.forEach(button => {
+                        if (button.textContent.trim() === 'Thorough Search') {
+                            // Click the button
+                            button.click();
+                        }
+                    });
+                }, clickDelay);
+            }
+        };
+
+        // Temporarly Do Expedition or Dungeon
+        let temporarlyDoExpedition = false;
+        let temporarlyDoDungeon = false;
+
         /***************
         *   Use Food   *
         ***************/
-
-        if (player.hp < 50) {
+        const lifePointsThreshold = 8000;
+        if (lifePoints < lifePointsThreshold) {
             console.log("Low health");
             //In case of low health, pause everything and eat food
             if (!pauseToEat) {
@@ -1034,6 +1152,7 @@
                         const foodItemsNodeList = document.querySelectorAll("[class^='item-i-7-']");
                         const foodItemsArray = Array.from(foodItemsNodeList);
                         const draggableFoodItems = foodItemsArray.filter(item => item.classList.contains('ui-draggable'));
+                        const draggableGreenFoodItems = draggableFoodItems.filter(item => (Number(item.getAttribute("data-level")) > 1));
                         console.log("Food Items: " + draggableFoodItems.length);
 
                         if (draggableFoodItems.length === 0) {
@@ -1048,7 +1167,11 @@
                             }
                         } else {
                             console.log("HP: " + player.hp);
-                            const randomFoodItem = draggableFoodItems[getRandomInt(0, draggableFoodItems.length - 1)];
+                            let randomFoodItem = draggableFoodItems[getRandomInt(0, draggableFoodItems.length - 1)];
+                            if (draggableGreenFoodItems.length > 0) {
+                                randomFoodItem = draggableGreenFoodItems[getRandomInt(0, draggableGreenFoodItems.length - 1)];
+                                console.log("Random Food Item: " + randomFoodItem);
+                            }
 
                             setTimeout(function () {
                                 randomFoodItem.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
@@ -1067,13 +1190,13 @@
                 if (doArena) {
                     setDoArena(false);
                 }
-                if (!doDungeon) {
+                if (!doDungeon && !inUnderworld) {
                     setTimeout(function () {
                         $("#mainmenu a.menuitem")[1].click();
                     }, clickDelay * 2);
                 }
             };
-        } else if (player.hp > 49) {
+        } else if (lifePoints > lifePointsThreshold - 100) {
             // Remove low health alert
             // if (document.getElementById("lowHealth")) {
             //     document.getElementById("lowHealth").remove();
@@ -1143,7 +1266,7 @@
                         }
 
                         // Check the price of the item
-                        let price = parseInt(row.cells[2].textContent.trim().replace('.', ''));
+                        let price = parseInt(row.cells[2].textContent.trim().replace(/\./g, ''));
                         console.log("Price: " + price);
 
                         // Check if the price and market fee (4%) is less than the player's gold
@@ -1165,29 +1288,66 @@
                     }
                     // No item found to buy at the saveGoldAmount price
                     // Set the saveGoldAmount lower
+                    // if (saveGoldState === 0) {
+                    //     if (saveGoldAmount === 1000000) {
+                    //         setSaveGoldState(0);
+                    //         setSaveGoldAmount(750000);
+                    //     } else if (saveGoldAmount === 750000) {
+                    //         setSaveGoldState(0);
+                    //         setSaveGoldAmount(500000);
+                    //     } else if (saveGoldAmount === 500000) {
+                    //         setSaveGoldState(0);
+                    //         setSaveGoldAmount(250000);
+                    //     } else if (saveGoldAmount === 250000) {
+                    //         setSaveGoldState(0);
+                    //         setSaveGoldAmount(100000);
+                    //     } else {
+                    //         setSaveGoldAmount(0);
+                    //         setPauseToSaveGold(false);
+                    //         setSaveGold(false);
+                    //     }
+                    //     // Refresh the page to get the latest items
+                    //     setTimeout(function () {
+                    //         location.reload();
+                    //     }, clickDelay * 2);
+                    // }
+                    // Set the saveGoldAmount to the price of the first item that can be bought
                     if (saveGoldState === 0) {
-                        if (saveGoldAmount === 1000000) {
-                            setSaveGoldState(0);
-                            setSaveGoldAmount(750000);
-                        } else if (saveGoldAmount === 750000) {
-                            setSaveGoldState(0);
-                            setSaveGoldAmount(500000);
-                        } else if (saveGoldAmount === 500000) {
-                            setSaveGoldState(0);
-                            setSaveGoldAmount(250000);
-                        } else if (saveGoldAmount === 250000) {
-                            setSaveGoldState(0);
-                            setSaveGoldAmount(100000);
-                        } else {
-                            setSaveGoldAmount(0);
-                            setPauseToSaveGold(false);
-                            setSaveGold(false);
+                        console.log("No item found to buy at price: " + saveGoldAmount);
+                        let price = 0;
+                        for (let row of table.rows) {
+                            // Skip the first row (header)
+                            if (row.rowIndex === 0) {
+                                continue;
+                            }
+
+                            // Check if the item can be bought
+                            if (row.cells[5].querySelector('input').value === "Cancel") {
+                                continue;
+                            }
+
+                            // Check the price of the item
+                            let itemPrice = parseInt(row.cells[2].textContent.trim().replace(/\./g, ''));
+                            if (itemPrice > 1000) {
+                                price = itemPrice;
+                                break;
+                            }
                         }
+                        console.log("Setting Save Gold Amount: " + price);
+                        if (price === 0) {
+                            setSaveGoldAmount(price);
+                            setSaveGold(false);
+                            setPauseToSaveGold(false);
+                        } else {
+                            setSaveGoldAmount(price);
+                        }
+
                         // Refresh the page to get the latest items
                         setTimeout(function () {
                             location.reload();
-                        }, clickDelay);
+                        }, clickDelay * 2);
                     }
+
                 } else if (inGuildMarketPage && saveGoldState === 1) {
                     // Item was bought, go to packages to retrieve
                     const linkPackages = document.getElementById('menue_packages');
@@ -1264,6 +1424,41 @@
                     // if (!enoughExpeditionPoints()) {
                     //     setDoExpedition(false);
                     // }
+                    let table = document.getElementById('market_item_table');
+                    // Set the saveGoldAmount to the price of the first item that can be bought
+                    if (saveGoldState === 0) {
+                        let price = 0;
+                        for (let row of table.rows) {
+                            // Skip the first row (header)
+                            if (row.rowIndex === 0) {
+                                continue;
+                            }
+
+                            // Check if the item can be bought
+                            if (row.cells[5].querySelector('input').value === "Cancel") {
+                                continue;
+                            }
+
+                            // Check the price of the item
+                            let itemPrice = parseInt(row.cells[2].textContent.trim().replace(/\./g, ''));
+                            if (itemPrice > 1000) {
+                                price = itemPrice;
+                                break;
+                            }
+                        }
+                        console.log("Setting Save Gold Amount: " + price);
+                        if (price === 0) {
+                            setSaveGoldAmount(price);
+                            setSaveGold(false);
+                        } else {
+                            setSaveGoldAmount(price);
+                        }
+
+                        // Refresh the page to get the latest items
+                        setTimeout(function () {
+                            location.reload();
+                        }, clickDelay * 2);
+                    }
                 }
             }
         }
@@ -1285,11 +1480,37 @@
         //     setDoExpedition(true);
         // }
 
-        // Start doing dungeons if the dungeon points are over 16
-        if (!doDungeon) {
+        // Update the Dungeon queue
+        function updateDungeonQueue() {
+            if ($("body").first().attr("id") === "questsPage") {
+                const activeQuests = $("#content .contentboard_slot_active");
+                let newQueue = 0;
+
+                for (const quest of activeQuests) {
+                    if (quest.getElementsByClassName("quest_slot_icon")[0].style.backgroundImage.includes('dc366909fdfe69897d583583f6e446')) {
+                        const questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
+                        if (questTitle.includes("your choice")) {
+                            // Check progress: <div class="quest_slot_progress">3 / 4</div>
+                            const progress = quest.getElementsByClassName("quest_slot_progress")[0].innerText;
+                            const progressCurrent = Number(progress.split(" / ")[0]);
+                            const progressTotal = Number(progress.split(" / ")[1]);
+                            newQueue = progressTotal - progressCurrent;
+                        }
+                    }
+                }
+                console.log('New Dungeon Queue:' + newQueue);
+                setDungeonQueue(newQueue);
+            }
+        }
+        updateDungeonQueue();
+
+        // Start doing dungeons if the dungeon points are overflowing or if there are quests in the queue
+        if (!inUnderworld && dungeonAvailable) {
             let dungeonPoints = Number(document.getElementById('dungeonpoints_value_point').innerText);
             if (dungeonPoints > 18) {
-                setDoDungeon(true);
+                temporarlyDoDungeon = true;
+            } else if (doQuests && dungeonQueue > 0) {
+                temporarlyDoDungeon = true;
             }
         }
 
@@ -1337,6 +1558,12 @@
             }
         }
         updateExpeditonQueue();
+
+        // turn on doExpedition if there are quests in the queue
+        if (expeditionQueue.length > 0 && doQuests === true) {
+            temporarlyDoExpedition = true;
+        }
+
 
         /****************
         * Handle Quests *
@@ -1464,26 +1691,57 @@
                         // Div Sample: <div class="quest_slot_title">Cliff Jumper: Defeat 5 opponents of your choice</div>
                         const questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
 
-                        if (questTitle.includes("Mine") && questTitle.includes("your choice")) {
+                        if (questTitle.includes("the boss")) {
+                            return 1;
+                        } else if (questTitle.includes("each opponent")) {
                             return 0;
-                        } else if (questTitle.includes("Teuton Camp") && questTitle.includes("your choice")) {
-                            return 1;
-                        } else if (questTitle.includes("Koman Mountain") && questTitle.includes("your choice")) {
-                            return 1;
-                        } else if (questTitle.includes("the boss")) {
-                            return 1;
-                        } else {
-                            return 0;
-                        };
+                        }
+
+                        const questTime = quest.getElementsByClassName("quest_slot_time")
+                        if (questTime.length && questTitle.includes("your choice")) {
+                            const questDefeatNoOpponents = Number(questTitle.split("Defeat ")[1].split(" ")[0]);
+                            const expeditionPoints = Number(document.getElementById('expeditionpoints_value_point').innerText);
+                            // Check if the number of opponents is greater than the available expedition points
+                            if (questDefeatNoOpponents > (expeditionPoints + 1)) {
+                                return 0;
+                            }
+                        }
+
+                        if (questTitle.includes("your choice")) {
+                            const questDefeatNoOpponents = Number(questTitle.split("Defeat ")[1].split(" ")[0]);
+                            const questGodReward = getQuestGodReward(quest);
+
+                            if (questTitle.includes("Teuton Camp") && (questDefeatNoOpponents < 4) && (questGodReward > 1)) {
+                                return 0;
+                            } else if (questTitle.includes("Koman Mountain") && (questDefeatNoOpponents < 3) && (questGodReward > 1)) {
+                                return 0;
+                            } else if (questTitle.includes("Dragon Remains") && (questDefeatNoOpponents < 3) && (questGodReward > 1)) {
+                                return 1;
+                            } else if (questTitle.includes("Bank of the Thames")) {
+                                return 1;
+                            }
+                        }
+
+                        return 0;
                     }
 
                     function getDungeonQuestType(quest) {
                         // Determines the type of dungeon quest
                         const questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
 
-                        if (questTitle.includes("Externsteine")) {
+                        const questTime = quest.getElementsByClassName("quest_slot_time")
+                        if (questTime.length && questTitle.includes("your choice")) {
+                            const questDefeatNoOpponents = Number(questTitle.split("Defeat ")[1].split(" ")[0]);
+                            const expeditionPoints = Number(document.getElementById('dungeonpoints_value_point').innerText);
+                            // Check if the number of opponents is greater than the available expedition points
+                            if (questDefeatNoOpponents > (expeditionPoints + 1)) {
+                                return 0;
+                            }
+                        }
+
+                        if (questTitle.includes("Alpha & Omega")) {
                             let goldReward = getQuestReward(quest);
-                            if (goldReward > 5000) {
+                            if (goldReward > 3000) {
                                 return 1;
                             } else {
                                 return 0;
@@ -1571,8 +1829,6 @@
                         return false;
                     }
 
-
-
                     function getQuestGodReward(quest) {
                         // Function to determine the god reward of a quest
                         /* Div Samples:
@@ -1659,7 +1915,7 @@
                                 //         console.log('Combat/Items/Arena quest accepted');
                                 //         return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
                                 //     }
-                            } else if (icon === 'combat' || icon === 'items') {
+                            } else if (icon === 'combat') {
                                 // Only accept combat/items quests with a gold/experience ratio greater than 1500
                                 let goldReward = getQuestReward(quest);
                                 let experienceReward = getQuestExperience(quest);
@@ -1667,7 +1923,18 @@
 
                                 let godReward = getQuestGodReward(quest);
 
-                                if (goldExperienceRatio > 2000.0 && godReward > 0) {
+                                if (goldExperienceRatio > 500.0) { // && godReward > 0
+                                    console.log('Combat/Items quest accepted');
+                                    return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
+                                }
+                            } else if (icon === 'items') {
+                                // Only accept items quests with low item number and a god reward
+                                let questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
+                                let numberOfItems = Number(questTitle.split("Find ")[1].split(" ")[0]);
+
+                                let godReward = getQuestGodReward(quest);
+
+                                if (numberOfItems < 5 && godReward > 0) {
                                     console.log('Combat/Items quest accepted');
                                     return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
                                 }
@@ -1715,10 +1982,64 @@
         }
 
         /****************
+        * Go Underworld *
+        ****************/
+
+        else if (!pauseToEat && !pauseToSaveGold && inUnderworld && doExpedition === true && document.getElementById("cooldown_bar_fill_expedition").classList.contains("cooldown_bar_fill_ready") === true) {
+            function goUnderworld() {
+                const inExpeditionPage = $("body").first().attr("id") === "locationPage";
+                const inEventExpeditionPage = document.getElementById("content").getElementsByTagName('img')[1].getAttribute('src') === 'img/ui/expedition_points2.png';
+
+                if (!inExpeditionPage || inEventExpeditionPage) {
+                    document.getElementsByClassName("cooldown_bar_link")[0].click();
+                } else {
+                    // Current location: <a href="index.php?mod=location&amp;loc=7&amp;sh=38e12827038a096a39bd9813a68061b9" class="awesome-tabs current">Koman Mountain</a>
+                    const currentLocation = document.getElementById("mainnav").getElementsByClassName("awesome-tabs current")[0].innerText;
+
+                    // Select the highest active location from the expedition locations
+                    if (!document.getElementById("submenu2")) {
+                        return;
+                    }
+                    const locationElements = document.getElementById("submenu2").getElementsByClassName("menuitem");
+                    // Remove inactive locations
+                    const activeLocationElements = Array.from(locationElements).filter(locationElement => !locationElement.classList.contains("inactive"));
+                    const highestLocationElement = activeLocationElements[activeLocationElements.length - 1];
+                    const highestLocation = highestLocationElement.innerText.trim();
+
+
+                    if (currentLocation === highestLocation) {
+                        // Fight the strongest monster
+                        // 1. Find the expedition boxes: <div class="expedition_box"
+                        const expeditionBoxes = document.getElementsByClassName("expedition_box");
+                        // 2. Iterate on the expedition boxes and check if the expedition bonus box has expedition_bonus divs in it: <div class="expedition_bonus_box">
+                        for (let i = expeditionBoxes.length - 1; i >= 0; i--) {
+                            const expeditionBonusBox = expeditionBoxes[i].getElementsByClassName("expedition_bonus_box")[0];
+                            if (expeditionBonusBox.childElementCount != 0) {
+                                return expeditionBoxes[i].getElementsByClassName("expedition_button")[0].click();
+                            }
+                        }
+                    } else {
+                        // Go to the highest location
+                        return highestLocationElement.click();
+                    }
+                }
+            };
+
+            setTimeout(function () {
+                goUnderworld();
+            }, clickDelay);
+
+            // Reload expedition page in case of failed goExpedition() call
+            setTimeout(function () {
+                document.getElementsByClassName("cooldown_bar_link")[0].click();
+            }, clickDelay * 5);
+        }
+
+        /****************
         * Go Expedition *
         ****************/
 
-        else if (!pauseToEat && !pauseToSaveGold && doExpedition === true && document.getElementById("cooldown_bar_fill_expedition").classList.contains("cooldown_bar_fill_ready") === true) {
+        else if (!pauseToEat && !pauseToSaveGold && !inUnderworld && (doExpedition === true || temporarlyDoExpedition === true) && document.getElementById("cooldown_bar_fill_expedition").classList.contains("cooldown_bar_fill_ready") === true) {
             function goExpedition() {
                 const inExpeditionPage = $("body").first().attr("id") === "locationPage";
                 const inEventExpeditionPage = document.getElementById("content").getElementsByTagName('img')[1].getAttribute('src') === 'img/ui/expedition_points2.png';
@@ -1730,10 +2051,14 @@
                     const currentLocation = document.getElementById("mainnav").getElementsByClassName("awesome-tabs current")[0].innerText;
 
                     // Select the highest active location from the expedition locations
+                    if (!document.getElementById("submenu2")) {
+                        return;
+                    }
                     const locationElements = document.getElementById("submenu2").getElementsByClassName("menuitem");
                     // Remove inactive locations
                     const activeLocationElements = Array.from(locationElements).filter(locationElement => !locationElement.classList.contains("inactive"));
-                    const highestLocationElement = activeLocationElements[activeLocationElements.length - 1];
+                    const activeExpLocationElements = Array.from(activeLocationElements).filter(locationElement => !locationElement.classList.contains("glow"));
+                    const highestLocationElement = activeExpLocationElements[activeExpLocationElements.length - 1];
                     const highestLocation = highestLocationElement.innerText.trim();
 
                     // Do an expedition from the queue if there are any
@@ -1790,7 +2115,7 @@
         * Go Dungeon  *
         **************/
 
-        else if (!pauseToEat && !pauseToSaveGold && doDungeon === true && document.getElementById("cooldown_bar_fill_dungeon").classList.contains("cooldown_bar_fill_ready") === true) {
+        else if (!pauseToEat && !pauseToSaveGold && (doDungeon || temporarlyDoDungeon) && dungeonAvailable && document.getElementById("cooldown_bar_fill_dungeon").classList.contains("cooldown_bar_fill_ready") === true) {
             function goDungeon() {
                 const inDungeonPage = $("body").first().attr("id") === "dungeonPage";
 
@@ -1807,19 +2132,26 @@
                         }
                     } else {
                         const areaElements = document.getElementById("content").getElementsByTagName("area");
-                        const mapLabels = document.querySelectorAll('.map_label');
+                        // const mapLabels = document.querySelectorAll('.map_label');
 
                         // Go for boss if it is available and each opponent was attacked at least once
-                        if (mapLabels.length) {
-                            // Retreive the text content of the labels
-                            const mapLabelsText = Array.from(mapLabels).map(label => label.textContent.trim());
-                            const mapLabelsonClick = Array.from(mapLabels).map(label => label.getAttribute('onclick').split("'")[1]);
+                        // if (mapLabels.length) {
+                        //     // Retreive the text content of the labels
+                        //     const mapLabelsText = Array.from(mapLabels).map(label => label.textContent.trim());
+                        //     const mapLabelsonClick = Array.from(mapLabels).map(label => label.getAttribute('onclick').split("'")[1]);
 
-                            // Go for boss
-                            if (mapLabelsText.includes("Boss") && (mapLabelsText.join().includes('1/2') || (mapLabelsText.join().includes('2/2') && mapLabels.length === 2))) {
-                                return mapLabels[mapLabelsText.indexOf("Boss")].click();
-                            }
+                        //     // Go for boss
+                        //     if (mapLabelsText.includes("Boss") && (mapLabelsText.join().includes('1/2') || (mapLabelsText.join().includes('2/2') && mapLabels.length === 2))) {
+                        //         return mapLabels[mapLabelsText.indexOf("Boss")].click();
+                        //     }
+                        // }
+
+                        // Reset nextQuestTime if only one (or 0) dungeon is left
+                        if (dungeonQueue < 2) {
+                            nextQuestTime = currentTime - 1000;
+                            localStorage.setItem('nextQuestTime', nextQuestTime);
                         }
+                        setDungeonQueue(dungeonQueue - 1);
 
                         // Go for the default opponent
                         const lastAreaElement = areaElements[areaElements.length - 1];
@@ -1934,6 +2266,9 @@
 
         else if (!pauseToEat && !pauseToSaveGold && doEventExpedition === true && nextEventExpeditionTime < currentTime && eventPoints > 0) {
             function goEventExpedition() {
+                if (!document.getElementById("submenu2")) {
+                    return;
+                }
                 const inEventExpeditionPage = document.getElementById("submenu2").getElementsByClassName("menuitem active glow")[0];
 
                 if (!inEventExpeditionPage) {
@@ -1989,7 +2324,7 @@
             if (!pauseToEat && !pauseToSaveGold && safeMode === false) {
                 const actions = [];
 
-                if (doExpedition === true) {
+                if (doExpedition === true || temporarlyDoExpedition === true) {
                     const timeTo = convertTimeToMs(document.getElementById("cooldown_bar_text_expedition").innerText);
 
                     actions.push({
@@ -1999,7 +2334,7 @@
                     });
                 };
 
-                if (doDungeon === true) {
+                if (doDungeon === true || temporarlyDoDungeon === true) {
                     const timeTo = convertTimeToMs(document.getElementById("cooldown_bar_text_dungeon").innerText);
 
                     actions.push({
@@ -2127,7 +2462,9 @@
 
                     if (nextAction.time <= 0) {
                         if (nextAction.index === 4) {
-                            document.getElementById("submenu2").getElementsByClassName("menuitem glow")[0].click();
+                            if (document.getElementById("submenu2")) {
+                                document.getElementById("submenu2").getElementsByClassName("menuitem glow")[0].click();
+                            }
                         } else if (nextAction.index === 5) {
                             setTimeout(function () {
                                 $("#mainmenu a.menuitem")[1].click();
