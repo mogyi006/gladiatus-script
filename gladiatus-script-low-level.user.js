@@ -901,6 +901,21 @@
             }, clickDelay);
         };
 
+        // Thorough Search
+        if (document.getElementById("blackoutDialog") !== null) {
+            let lootButtons = document.querySelectorAll('.loot-button');
+            if (lootButtons.length > 0) {
+                setTimeout(function () {
+                    lootButtons.forEach(button => {
+                        if (button.textContent.trim() === 'Thorough Search') {
+                            // Click the button
+                            button.click();
+                        }
+                    });
+                }, clickDelay);
+            }
+        };
+
         /***************
         *   Use Food   *
         ***************/
@@ -1545,17 +1560,8 @@
                                     return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
                                 }
                             } else if (icon === 'combat' || icon === 'items' || icon === 'arena' || icon === 'circus') {
-                                // Only accept combat/items quests with a gold/experience ratio greater than 1500
-                                let goldReward = getQuestReward(quest);
-                                let experienceReward = getQuestExperience(quest);
-                                let goldExperienceRatio = goldReward / experienceReward;
-
-                                let godReward = getQuestGodReward(quest);
-
-                                if (goldExperienceRatio > 0) {
-                                    console.log('Combat/Items quest accepted');
-                                    return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
-                                }
+                                console.log('Combat/Items quest accepted');
+                                return quest.getElementsByClassName("quest_slot_button_accept")[0].click();
                             } else if (icon === 'dungeon') {
                                 // Only accept certain types of dungeon quests
                                 let dungeonType = getDungeonQuestType(quest);
@@ -1585,7 +1591,7 @@
                     nextQuestTime = currentTime + nextQuestIn
                     localStorage.setItem('nextQuestTime', nextQuestTime)
                 } else {
-                    nextQuestTime = currentTime + 360000;
+                    nextQuestTime = currentTime + 180000;
                     localStorage.setItem('nextQuestTime', nextQuestTime)
                 }
                 autoGo();
@@ -1655,6 +1661,10 @@
             setTimeout(function () {
                 goDungeon();
             }, clickDelay);
+
+            setTimeout(function () {
+                document.getElementsByClassName("cooldown_bar_link")[1].click();
+            }, clickDelay * 5);
         }
 
         /************************

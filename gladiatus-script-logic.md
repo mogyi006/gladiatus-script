@@ -4,6 +4,7 @@ The script should be able to do the following:
 - Do dungeons with corresponding quests
 - Do expeditions
 - Save gold and buy items from the market
+- Eat food when health is below 40%
 
 ## Dungeon Logic
 Goal: Only do dungeons when all 3 types of quests are active and stop when they are not.
@@ -27,3 +28,11 @@ Steps:
 - Retrive the item
 - Go to the market
 - Sell the item for 100000 gold
+
+
+# Eat Food Logic
+Goal: Eat food when health is below 40%
+- Check if the health is below 40%
+- If yes, navigate to the overview page
+- Check if there is food in the inventory
+- If yes, double click on the food item

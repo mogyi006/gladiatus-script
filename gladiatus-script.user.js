@@ -971,7 +971,7 @@
             setEatFood(true);
         } else if (country === "Germania") {
             setDoExpedition(false);
-            // setDoDungeon(true);
+            setDoDungeon(true);
             setEatFood(true);
         } else if (country === "Britannia") {
             // setDoExpedition(true);
@@ -1044,10 +1044,14 @@
         // Thorough Search
         if (document.getElementById("blackoutDialog") !== null) {
             let lootButtons = document.querySelectorAll('.loot-button');
+            let searchString = 'Thorough Search';
+            if (inUnderworld) {
+                searchString = 'Quick Search';
+            }
             if (lootButtons.length > 0) {
                 setTimeout(function () {
                     lootButtons.forEach(button => {
-                        if (button.textContent.trim() === 'Thorough Search') {
+                        if (button.textContent.trim() === searchString) {
                             // Click the button
                             button.click();
                         }
@@ -1383,6 +1387,12 @@
                         }, clickDelay * 4);
                     } else {
                         console.log("Item level does not match...");
+                        setSaveGoldState(0);
+                        setPauseToSaveGold(false);
+                        // Go to quests page
+                        setTimeout(function () {
+                            $("#mainmenu a.menuitem")[3].click();
+                        }, clickDelay);
                     }
                 } else if (inGuildMarketPage && saveGoldState === 2) {
                     // Sell Package for the same price
@@ -1507,7 +1517,7 @@
         // Start doing dungeons if the dungeon points are overflowing or if there are quests in the queue
         if (!inUnderworld && dungeonAvailable) {
             let dungeonPoints = Number(document.getElementById('dungeonpoints_value_point').innerText);
-            if (dungeonPoints > 18) {
+            if (dungeonPoints > 12) {
                 temporarlyDoDungeon = true;
             } else if (doQuests && dungeonQueue > 0) {
                 temporarlyDoDungeon = true;
@@ -1603,31 +1613,31 @@
             };
 
             function getIconName(url) {
-                if (url.includes('8aada67d4c5601e009b9d2a88f478c')) {
+                if (url.includes('icon_combat')) {
                     return 'combat';
                 }
 
-                if (url.includes('00f1a594723515a77dcd6d66c918fb')) {
+                if (url.includes('icon_arena')) {
                     return 'arena';
                 }
 
-                if (url.includes('586768e942030301c484347698bc5e')) {
+                if (url.includes('icon_grouparena')) {
                     return 'circus';
                 }
 
-                if (url.includes('4e41ab43222200aa024ee177efef8f')) {
+                if (url.includes('icon_expedition')) {
                     return 'expedition';
                 }
 
-                if (url.includes('dc366909fdfe69897d583583f6e446')) {
+                if (url.includes('icon_dungeon')) {
                     return 'dungeon';
                 }
 
-                if (url.includes('5a358e0a030d8551a5a65d284c8730')) {
+                if (url.includes('icon_items')) {
                     return 'items';
                 }
 
-                if (url.includes('a8b91ecab5813f97708e0e86f35e06')) {
+                if (url.includes('icon_work')) {
                     return 'work';
                 }
 
@@ -1667,15 +1677,15 @@
 
                 let dungeonPoints = Number(document.getElementById('dungeonpoints_value_point').innerText);
 
-                if (activeDungeonQuests < 2 || dungeonPoints < 8) {
-                    setDoDungeon(false);
-                } else if (activeDungeonQuests === 3) {
-                    setDoDungeon(true);
-                } else if (activeDungeonQuestsChoice && numberOfOpponents > 3 && activeDungeonQuestsEach) {
-                    setDoDungeon(true);
-                } else if (activeDungeonQuestsEach) {
-                    setDoDungeon(true);
-                }
+                // if (activeDungeonQuests < 2 || dungeonPoints < 8) {
+                //     setDoDungeon(false);
+                // } else if (activeDungeonQuests === 3) {
+                //     setDoDungeon(true);
+                // } else if (activeDungeonQuestsChoice && numberOfOpponents > 3 && activeDungeonQuestsEach) {
+                //     setDoDungeon(true);
+                // } else if (activeDungeonQuestsEach) {
+                //     setDoDungeon(true);
+                // }
             }
 
             function takeQuest() {
@@ -1691,9 +1701,11 @@
                         // Div Sample: <div class="quest_slot_title">Cliff Jumper: Defeat 5 opponents of your choice</div>
                         const questTitle = quest.getElementsByClassName("quest_slot_title")[0].innerText;
 
-                        if (questTitle.includes("the boss")) {
+                        if (questTitle.includes("the boss") && questTitle.includes("The Moor")) {
                             return 1;
                         } else if (questTitle.includes("each opponent")) {
+                            return 0;
+                        } else if (questTitle.includes("the boss")) {
                             return 0;
                         }
 
@@ -1711,13 +1723,11 @@
                             const questDefeatNoOpponents = Number(questTitle.split("Defeat ")[1].split(" ")[0]);
                             const questGodReward = getQuestGodReward(quest);
 
-                            if (questTitle.includes("Teuton Camp") && (questDefeatNoOpponents < 4) && (questGodReward > 1)) {
-                                return 0;
-                            } else if (questTitle.includes("Koman Mountain") && (questDefeatNoOpponents < 3) && (questGodReward > 1)) {
-                                return 0;
-                            } else if (questTitle.includes("Dragon Remains") && (questDefeatNoOpponents < 3) && (questGodReward > 1)) {
+                            if (questTitle.includes("Bank of the Thames") && (questDefeatNoOpponents < 4) && (questGodReward > 1)) {
                                 return 1;
-                            } else if (questTitle.includes("Bank of the Thames")) {
+                            } else if (questTitle.includes("Forest Fortress") && (questDefeatNoOpponents < 5)) {
+                                return 0;
+                            } else if (questTitle.includes("The Moor")) {
                                 return 1;
                             }
                         }
@@ -1891,7 +1901,7 @@
                     }
 
 
-                    const availableQuests = $("#content .contentboard_slot_inactive");
+                    const availableQuests = document.querySelectorAll(".contentboard_slot.contentboard_slot_inactive");
 
                     for (const quest of availableQuests) {
                         let icon = getIconName(quest.getElementsByClassName("quest_slot_icon")[0].style.backgroundImage);
